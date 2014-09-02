@@ -1,0 +1,38 @@
+This README describes the Python bindings for Brian Gladman's AES module.
+
+You can build a binary distribution like this:
+    $ python setup.py bdist
+
+Or, for development work:
+    $ python setup.py build_ext --inplace
+
+Usage is fairly straightforward:
+
+#!/usr/bin/python
+
+import brg
+from os import urandom
+from array import array
+
+random_iv = urandom(16)
+random_key = urandom(16)
+data = array('B', 'AB' * 32 + 'ZY' * 32)
+
+aes_ecb = brg.aes(key=random_key, mode='ecb')
+aes_cbc = brg.aes(key=random_key, mode='cbc', iv=random_iv)
+
+# ECB mode encryption
+print data.tostring()
+aes_ecb.encrypt(data)
+print data
+aes_ecb.decrypt(data)
+print data.tostring()
+
+# CBC mode encryption
+print data.tostring()
+aes_cbc.encrypt(data)
+print data
+aes_cbc.reset()
+aes_cbc.decrypt(data)
+print data.tostring()
+aes_cbc.reset()

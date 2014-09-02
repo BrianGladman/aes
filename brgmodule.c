@@ -21,7 +21,7 @@ Issue Date: 30/08/2014
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <endian.h> /* XXX consider using ntohl/htonl from arpa/inet.h? */
+#include <endian.h>
 #include <sys/mman.h>
 #include <Python.h>
 #include <structmember.h>
@@ -38,7 +38,6 @@ typedef enum {
 typedef struct {
     PyObject_HEAD
     aes_mode mode;
-    int block_size;
     aes_encrypt_ctx ectx[1] __attribute__ ((aligned(16)));
     aes_decrypt_ctx dctx[1] __attribute__ ((aligned(16)));
     unsigned char iv[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
@@ -194,7 +193,6 @@ static PyMethodDef aes_methods[] = {
 };
 
 static PyMemberDef aes_members[] = {
-    {"block_size", T_INT, offsetof(brg_aesObject, block_size), 0, "AES block size"},
     {NULL}  /* Sentinel */
 };
 
@@ -205,7 +203,6 @@ static int py_aes_init(brg_aesObject *self, PyObject *args, PyObject *kwds) {
     unsigned char *key = NULL, *iv = NULL;
     char *kwlist[] = {"key", "mode", "iv", NULL};
 
-    self->block_size = AES_BLOCK_SIZE;
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "t#s|t#", kwlist, &key, &key_len, &mode, &iv, &iv_len))
         return -1;
     /* determine the operation mode */

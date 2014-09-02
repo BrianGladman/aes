@@ -18,13 +18,25 @@ and fitness for purpose.
 Issue Date: 30/08/2014
 */
 
+#define HAVE_ROUND 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <endian.h>
-#include <sys/mman.h>
 #include <Python.h>
 #include <structmember.h>
+
+#ifndef _MSC_VER
+#  include <endian.h>
+#  include <sys/mman.h>
+#else
+#  include <Windows.h>
+#  include <malloc.h>
+#  include <intrin.h>
+#  pragma intrinsic( _byteswap_uint64 )
+#  define strncasecmp _strnicmp
+#endif
+
 #include "aes.h"
 
 typedef enum {
@@ -35,6 +47,20 @@ typedef enum {
     AES_MODE_CTR
 } aes_mode;
 
+#ifdef _MSC_VER
+
+typedef struct 
+{
+    PyObject_HEAD
+    aes_mode mode;
+    __declspec(align(16)) aes_encrypt_ctx ectx[1];
+    __declspec(align(16)) aes_decrypt_ctx dctx[1];
+    __declspec(align(16)) unsigned char iv[AES_BLOCK_SIZE];
+    __declspec(align(16)) unsigned char iv_o[AES_BLOCK_SIZE];
+} brg_aesObject;
+
+#else
+
 typedef struct {
     PyObject_HEAD
     aes_mode mode;
@@ -44,27 +70,35 @@ typedef struct {
     unsigned char iv_o[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
 } brg_aesObject;
 
+#endif
+
 /*
 This subroutine implements the CTR mode standard incrementing function.
 See NIST Special Publication 800-38A, Appendix B for details:
 http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
 */
-void ctr_inc(unsigned char *cbuf) {
+void ctr_inc(unsigned char *cbuf) 
+{
     uint64_t c;
-
-    #if BYTE_ORDER == LITTLE_ENDIAN
+#ifdef _MSC_VER
+    c = _byteswap_uint64(*(uint64_t *)(cbuf + 8));
+    c++;
+    *(uint64_t *)(cbuf + 8) = _byteswap_uint64(c);
+#else
+# if BYTE_ORDER == LITTLE_ENDIAN
     c = be64toh(*(uint64_t *)(cbuf + 8));
     c++;
     *(uint64_t *)(cbuf + 8) = be64toh(c);
-    #elif BYTE_ORDER == BIG_ENDIAN
+# elif BYTE_ORDER == BIG_ENDIAN
     /* big endian support? completely untested... */
     c = be64toh(*(uint64_t *)(cbuf + 0));
     c++;
     *(uint64_t *)(cbuf + 0) = be64toh(c);
-    #else
+# else
     /* something more exotic? */
     #error "Unsupported byte order"
-    #endif
+# endif
+#endif
     return;
 }
 
@@ -93,20 +127,20 @@ static PyObject *py_aes_encrypt(brg_aesObject *self, PyObject *args) {
     /* Perform the real encryption operation */
     switch(mode) {
     case AES_MODE_ECB:
-        ret = aes_ecb_encrypt(data, data, data_len, self->ectx);
+        ret = aes_ecb_encrypt(data, data, (int)data_len, self->ectx);
         break;
     case AES_MODE_CBC:
-        ret = aes_cbc_encrypt(data, data, data_len, self->iv, self->ectx);
+        ret = aes_cbc_encrypt(data, data, (int)data_len, self->iv, self->ectx);
         break;
     case AES_MODE_CFB:
-        ret = aes_cfb_encrypt(data, data, data_len, self->iv, self->ectx);
+        ret = aes_cfb_encrypt(data, data, (int)data_len, self->iv, self->ectx);
         break;
     case AES_MODE_OFB:
-        ret = aes_ofb_encrypt(data, data, data_len, self->iv, self->ectx);
+        ret = aes_ofb_encrypt(data, data, (int)data_len, self->iv, self->ectx);
         break;
     case AES_MODE_CTR:
         /* cbuf data is passed as iv */
-        ret = aes_ctr_encrypt(data, data, data_len, self->iv, ctr_inc, self->ectx);
+        ret = aes_ctr_encrypt(data, data, (int)data_len, self->iv, ctr_inc, self->ectx);
         break;
     }
 
@@ -268,21 +302,33 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems) {
 
     required_mem = (size_t)type->tp_basicsize;
     if(type->tp_itemsize != 0) {
-        extra = type->ob_size * type->tp_itemsize;
+        extra = Py_SIZE(type) * type->tp_itemsize;
         /* round up to a multiple of sizeof(void *) */
         tmp = extra % sizeof(void *);
         if(tmp > 0)
             extra += (sizeof(void *) - tmp);
         required_mem += extra;
     }
+#ifdef _MSC_VER
+    if((self = _aligned_malloc(required_mem, 16)) == NULL)
+        return (PyObject *)PyErr_NoMemory();
+    if(VirtualLock(self, required_mem) == 0)
+    {
+        _aligned_free(self);
+        return (PyObject *)PyErr_NoMemory();
+    }
+#else
     success = posix_memalign((void **)&self, 16, required_mem);
     if (success != 0)
         return (PyObject *)PyErr_NoMemory();
     success = mlock(self, required_mem);
-    if (success != 0) {
+    if(success != 0)
+    {
         free(self);
         return (PyObject *)PyErr_NoMemory();
     }
+#endif
+
     memset(self, 0, required_mem);
     PyObject_INIT(self, type);
     return (PyObject *)self;
@@ -290,8 +336,13 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems) {
 
 void secure_free(void *self) {
     memset(self, 0, sizeof(brg_aesObject));
+#ifdef _MSC_VER
+    VirtualUnlock(self, sizeof(brg_aesObject));
+    _aligned_free(self);
+#else
     munlock(self, sizeof(brg_aesObject));
     free(self);
+#endif
     self = NULL;
     return;
 }
@@ -347,16 +398,38 @@ static PyMethodDef brg_methods[] = {
 #ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
 #define PyMODINIT_FUNC void
 #endif
-PyMODINIT_FUNC initbrg(void) {
+
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "brg",              /* m_name     */
+    "Python bindings",  /* m_doc      */
+    -1,                 /* m_size     */
+    brg_methods,        /* m_methods  */
+    NULL,               /* m_reload   */
+    NULL,               /* m_traverse */
+    NULL,               /* m_clear    */
+    NULL,               /* m_free     */
+};
+#endif
+
+PyMODINIT_FUNC initbrg(void)
+{
     PyObject *m;
 
     /*brg_aesType.tp_new = PyType_GenericNew;*/
     if (PyType_Ready(&brg_aesType) < 0)
         return;
 
-    m = Py_InitModule3("brg", brg_methods,
-                       "Python bindings for Brian Gladman's crypto code");
-
+#if PY_MAJOR_VERSION >= 3
+    m = PyModule_Create(&moduledef);
     Py_INCREF(&brg_aesType);
     PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
+    return m;
+#else
+    m = Py_InitModule3("brg", brg_methods,
+                       "Python bindings for Brian Gladman's crypto code");
+    Py_INCREF(&brg_aesType);
+    PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
+#endif
 }

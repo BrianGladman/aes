@@ -263,15 +263,6 @@ static int py_aes_init(brg_aesObject *self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-/*
-static PyObject *py_aes_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    brg_aesObject *self;
-
-    self = (brg_aesObject *)type->tp_alloc(type, 0);
-    return (PyObject *)self;
-}
-*/
-
 /* FIXME: handle nonzero type->tp_itemsize */
 /* https://docs.python.org/2/c-api/typeobj.html#PyTypeObject.tp_alloc */
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems) {

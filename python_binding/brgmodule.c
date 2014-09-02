@@ -110,7 +110,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *py_aes_encrypt(AES_Object *self, PyObject *args) 
+static PyObject *AES_encrypt(AES_Object *self, PyObject *args) 
 {
     aes_mode mode;
     Py_ssize_t data_len = 0;
@@ -160,7 +160,7 @@ static PyObject *py_aes_encrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *py_aes_decrypt(AES_Object *self, PyObject *args) 
+static PyObject *AES_decrypt(AES_Object *self, PyObject *args) 
 {
     aes_mode mode;
     int data_len = 0;
@@ -209,7 +209,7 @@ static PyObject *py_aes_decrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *py_aes_reset(AES_Object *self) 
+static PyObject *AES_reset(AES_Object *self) 
 {
     switch(self->mode) 
     {
@@ -232,9 +232,9 @@ static PyObject *py_aes_reset(AES_Object *self)
 
 static PyMethodDef aes_methods[] = 
 {
-    {"encrypt", (PyCFunction)py_aes_encrypt, METH_VARARGS, "encrypts a series of blocks"},
-    {"decrypt", (PyCFunction)py_aes_decrypt, METH_VARARGS, "decrypts a series of blocks"},
-    {"reset",   (PyCFunction)py_aes_reset,   METH_NOARGS, "resets the object state"},
+    {"encrypt", (PyCFunction)AES_encrypt, METH_VARARGS, "encrypts a series of blocks"},
+    {"decrypt", (PyCFunction)AES_decrypt, METH_VARARGS, "decrypts a series of blocks"},
+    {"reset",   (PyCFunction)AES_reset,   METH_NOARGS, "resets the object state"},
     {NULL}  /* Sentinel */
 };
 
@@ -243,7 +243,7 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int py_aes_init(AES_Object *self, PyObject *args, PyObject *kwds) 
+static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds) 
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -379,10 +379,16 @@ void secure_free(void *self)
     return;
 }
 
-static PyTypeObject brg_aesType = 
+#if PY_MAJOR_VERSION >= 3
+static PyTypeObject brg_aesType =
+{
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
+static PyTypeObject brg_aesType =
 {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
+#endif
     "AES",                     /*tp_name */
     sizeof(AES_Object),        /*tp_basicsize */
     0,                         /*tp_itemsize */
@@ -417,7 +423,7 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_descr_get */
     0,                         /*tp_descr_set */
     0,                         /*tp_dictoffset */
-    (initproc)py_aes_init,     /*tp_init */
+    (initproc)AES_init,     /*tp_init */
     (allocfunc)secure_alloc,   /*tp_alloc */
     (newfunc)PyType_GenericNew,/*tp_new */
     (freefunc)secure_free,     /*tp_free */
@@ -448,13 +454,18 @@ static struct PyModuleDef moduledef =
 };
 #endif
 
-PyMODINIT_FUNC PyInit_aes(void)
+#if PY_MAJOR_VERSION >= 3
+  PyMODINIT_FUNC PyInit_aes(void)
+#else
+  PyMODINIT_FUNC init_aes(void)
+#endif
+
 {
     PyObject *m;
 
     /* brg_aesType.tp_new = PyType_GenericNew; */
     if (PyType_Ready(&brg_aesType) < 0)
-        return;
+        return NULL;
 
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);

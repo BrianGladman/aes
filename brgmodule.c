@@ -260,23 +260,30 @@ static int py_aes_init(brg_aesObject *self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-/* FIXME: handle nonzero type->tp_itemsize */
 /* https://docs.python.org/2/c-api/typeobj.html#PyTypeObject.tp_alloc */
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems) {
     int success;
     brg_aesObject *self;
-    size_t tp_basicsize;
+    size_t required_mem, extra, tmp;
 
-    tp_basicsize = (size_t)type->tp_basicsize;
-    success = posix_memalign((void **)&self, 16, tp_basicsize);
+    required_mem = (size_t)type->tp_basicsize;
+    if(type->tp_itemsize != 0) {
+        extra = type->ob_size * type->tp_itemsize;
+        /* round up to a multiple of sizeof(void *) */
+        tmp = extra % sizeof(void *);
+        if(tmp > 0)
+            extra += (sizeof(void *) - tmp);
+        required_mem += extra;
+    }
+    success = posix_memalign((void **)&self, 16, required_mem);
     if (success != 0)
         return (PyObject *)PyErr_NoMemory();
-    success = mlock(self, tp_basicsize);
+    success = mlock(self, required_mem);
     if (success != 0) {
         free(self);
         return (PyObject *)PyErr_NoMemory();
     }
-    memset(self, 0, tp_basicsize);
+    memset(self, 0, required_mem);
     PyObject_INIT(self, type);
     return (PyObject *)self;
 }

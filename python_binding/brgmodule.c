@@ -34,6 +34,11 @@ Issue Date: 30/08/2014
 #  include <malloc.h>
 #  include <intrin.h>
 #  pragma intrinsic( _byteswap_uint64 )
+#  define LITTLE_ENDIAN 1234
+#  define BIG_ENDIAN    4321
+/* Must hard-code these for Windows */
+#  define BYTE_ORDER    LITTLE_ENDIAN
+#  define be64toh(x)    _byteswap_uint64(x)
 #  define strncasecmp _strnicmp
 #endif
 
@@ -82,24 +87,18 @@ http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
 void ctr_inc(unsigned char *cbuf) 
 {
     uint64_t c;
-#ifdef _MSC_VER
-    c = _byteswap_uint64(*(uint64_t *)(cbuf + 8));
-    c++;
-    *(uint64_t *)(cbuf + 8) = _byteswap_uint64(c);
-#else
-# if BYTE_ORDER == LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
     c = be64toh(*(uint64_t *)(cbuf + 8));
     c++;
     *(uint64_t *)(cbuf + 8) = be64toh(c);
-# elif BYTE_ORDER == BIG_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
     /* big endian support? completely untested... */
     c = be64toh(*(uint64_t *)(cbuf + 0));
     c++;
     *(uint64_t *)(cbuf + 0) = be64toh(c);
-# else
+#else
     /* something more exotic? */
     #error "Unsupported byte order"
-# endif
 #endif
     return;
 }

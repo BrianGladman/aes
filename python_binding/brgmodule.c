@@ -442,7 +442,7 @@ static PyMethodDef brg_methods[] =
 static struct PyModuleDef moduledef =
 {
     PyModuleDef_HEAD_INIT,
-    "AES",              /* m_name     */
+    "brg",              /* m_name     */
     "Python Bindings",  /* m_doc      */
     -1,                 /* m_size     */
     brg_methods,        /* m_methods  */
@@ -454,27 +454,28 @@ static struct PyModuleDef moduledef =
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-  PyMODINIT_FUNC PyInit_aes(void)
+  PyMODINIT_FUNC PyInit_brg(void)
 #else
-  PyMODINIT_FUNC init_aes(void)
+  PyMODINIT_FUNC initbrg(void)
 #endif
 
 {
     PyObject *m;
 
     /* brg_aesType.tp_new = PyType_GenericNew; */
+#if PY_MAJOR_VERSION >= 3
     if (PyType_Ready(&brg_aesType) < 0)
         return NULL;
-
-#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
     Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
     return m;
 #else
+    if (PyType_Ready(&brg_aesType) < 0)
+        return;
     m = Py_InitModule3("brg", brg_methods,
                        "Python bindings for Brian Gladman's crypto code");
     Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
 #endif
 }

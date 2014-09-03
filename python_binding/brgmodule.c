@@ -110,27 +110,42 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *encrypt(brg_aesObject *self, PyObject *args)
+static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
-    Py_buffer buf;
+    PyObject *iv;
+    Py_buffer dbuf;
+    Py_buffer ibuf;
     AES_RETURN ret = EXIT_FAILURE;
 
-    if(!PyArg_ParseTuple(args, "O", &data))
+    char *kwlist[] = { "data", "iv", NULL };
+
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &data, &iv))
         return NULL;
 
     if(!PyObject_CheckBuffer(data))
         return NULL;
 
-    if(PyObject_GetBuffer(data, &buf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+    if(PyObject_GetBuffer(data, &dbuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+        return NULL;
+
+    if(!PyObject_CheckBuffer(iv))
+        return NULL;
+
+    if(PyObject_GetBuffer(iv, &ibuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
         return NULL;
 
     /* Verify constraints based on mode */
     mode = self->mode;
-    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((buf.len & 15) != 0))
+    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((dbuf.len & 15) != 0))
     {
         PyErr_SetString(PyExc_ValueError, "Data size must be a multiple of 16 bytes");
+        return NULL;
+    }
+    if(!(mode == AES_MODE_ECB || ibuf.len == 16))
+    {
+        PyErr_SetString(PyExc_ValueError, "This mode requires a 16 byte iv or counter");
         return NULL;
     }
 
@@ -138,20 +153,20 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args)
     switch(mode)
     {
     case AES_MODE_ECB:
-        ret = aes_ecb_encrypt(buf.buf, buf.buf, (int)buf.len, self->ectx);
+        ret = aes_ecb_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, self->ectx);
         break;
     case AES_MODE_CBC:
-        ret = aes_cbc_encrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->ectx);
+        ret = aes_cbc_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->ectx);
         break;
     case AES_MODE_CFB:
-        ret = aes_cfb_encrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->ectx);
+        ret = aes_cfb_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->ectx);
         break;
     case AES_MODE_OFB:
-        ret = aes_ofb_encrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->ectx);
+        ret = aes_ofb_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->ectx);
         break;
     case AES_MODE_CTR:
         /* cbuf data is passed as iv */
-        ret = aes_ctr_encrypt(buf.buf, buf.buf, (int)buf.len, self->iv, ctr_inc, self->ectx);
+        ret = aes_ctr_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, ctr_inc, self->ectx);
         break;
     }
 
@@ -162,31 +177,47 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args)
         return NULL;
     }
 
-    PyBuffer_Release(&buf);
+    PyBuffer_Release(&ibuf);
+    PyBuffer_Release(&dbuf);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyObject *decrypt(brg_aesObject *self, PyObject *args)
+static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
-    Py_buffer buf;
+    PyObject *iv;
+    Py_buffer dbuf;
+    Py_buffer ibuf;
     AES_RETURN ret = EXIT_FAILURE;
 
-    if(!PyArg_ParseTuple(args, "O", &data))
+    char *kwlist[] = { "data", "iv", NULL };
+
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &data, &iv))
         return NULL;
 
     if(!PyObject_CheckBuffer(data))
         return NULL;
 
-    if(PyObject_GetBuffer(data, &buf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+    if(PyObject_GetBuffer(data, &dbuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+        return NULL;
+
+    if(!PyObject_CheckBuffer(iv))
+        return NULL;
+
+    if(PyObject_GetBuffer(iv, &ibuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
         return NULL;
 
     /* Verify constraints based on mode */
     mode = self->mode;
-    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((buf.len & 15) != 0)) {
+    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((dbuf.len & 15) != 0)) {
         PyErr_SetString(PyExc_ValueError, "Data size must be a multiple of 16 bytes");
+        return NULL;
+    }
+    if(!(mode == AES_MODE_ECB || ibuf.len == 16))
+    {
+        PyErr_SetString(PyExc_ValueError, "This mode requires a 16 byte iv or counter");
         return NULL;
     }
 
@@ -194,20 +225,20 @@ static PyObject *decrypt(brg_aesObject *self, PyObject *args)
     switch(mode)
     {
     case AES_MODE_ECB:
-        ret = aes_ecb_decrypt(buf.buf, buf.buf, (int)buf.len, self->dctx);
+        ret = aes_ecb_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, self->dctx);
         break;
     case AES_MODE_CBC:
-        ret = aes_cbc_decrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->dctx);
+        ret = aes_cbc_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->dctx);
         break;
     case AES_MODE_CFB:
-        ret = aes_cfb_decrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->ectx);
+        ret = aes_cfb_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->ectx);
         break;
     case AES_MODE_OFB:
-        ret = aes_ofb_decrypt(buf.buf, buf.buf, (int)buf.len, self->iv, self->ectx);
+        ret = aes_ofb_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, self->ectx);
         break;
     case AES_MODE_CTR:
         /* cbuf data is passed as iv */
-        ret = aes_ctr_decrypt(buf.buf, buf.buf, (int)buf.len, self->iv, ctr_inc, self->ectx);
+        ret = aes_ctr_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, ibuf.buf, ctr_inc, self->ectx);
         break;
     }
 
@@ -218,28 +249,15 @@ static PyObject *decrypt(brg_aesObject *self, PyObject *args)
         return NULL;
     }
 
-    PyBuffer_Release(&buf);
+    PyBuffer_Release(&ibuf);
+    PyBuffer_Release(&dbuf);
     Py_INCREF(Py_None);
     return Py_None;
 }
 
 static PyObject *reset(brg_aesObject *self)
 {
-    switch(self->mode)
-    {
-    case AES_MODE_ECB:
-        break;
-    case AES_MODE_CBC:
-        memcpy(self->iv, self->iv_o, AES_BLOCK_SIZE);
-        break;
-    case AES_MODE_CFB:
-    case AES_MODE_OFB:
-    case AES_MODE_CTR:
-        memcpy(self->iv, self->iv_o, AES_BLOCK_SIZE);
-        aes_mode_reset(self->ectx);
-        break;
-    }
-
+    aes_mode_reset(self->ectx);
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -257,28 +275,22 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int init (brg_aesObject *self, PyObject *args, PyObject *kwds)
+static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
-    PyObject *key, *iv;
-    Py_buffer key_buf, iv_buf;
+    PyObject *key;
+    Py_buffer key_buf;
 
-    char *kwlist[] = {"mode", "key", "iv", NULL};
+    char *kwlist[] = {"mode", "key", NULL};
 
-    if(!PyArg_ParseTupleAndKeywords(args, kwds, "sO|O", kwlist, &mode, &key, &iv))
+    if(!PyArg_ParseTupleAndKeywords(args, kwds, "sO", kwlist, &mode, &key))
         return -1;
 
     if(!PyObject_CheckBuffer(key))
         return -1;
 
     if(PyObject_GetBuffer(key, &key_buf, PyBUF_SIMPLE) < 0)
-        return -1;
-
-    if(!PyObject_CheckBuffer(iv))
-        return -1;
-
-    if(PyObject_GetBuffer(iv, &iv_buf, PyBUF_SIMPLE) < 0)
         return -1;
 
     /* determine the operation mode */
@@ -309,26 +321,7 @@ static int init (brg_aesObject *self, PyObject *args, PyObject *kwds)
         return -1;
     }
    
-    /* ensure required parameters have been passed */
-    switch(self->mode)
-    {
-    case AES_MODE_ECB:
-        // no additional parameters are required for ECB mode
-        break;
-    case AES_MODE_CBC:
-    case AES_MODE_CFB:
-    case AES_MODE_OFB:
-    case AES_MODE_CTR:
-        if(iv_buf.len != AES_BLOCK_SIZE)
-        {
-            PyErr_SetString(PyExc_ValueError, "A 16-byte IV must be supplied for this mode");
-            return -1;
-        }
-        memcpy(self->iv, iv_buf.buf, AES_BLOCK_SIZE);
-        /* Save a copy of the original IV, for possible reset later */
-        memcpy(self->iv_o, iv, AES_BLOCK_SIZE);
-        break;
-    }
+
     /* validate key length and initialize encryption / decryption states */
     switch(key_buf.len)
     {
@@ -350,7 +343,6 @@ static int init (brg_aesObject *self, PyObject *args, PyObject *kwds)
     }
 
     PyBuffer_Release(&key_buf);
-    PyBuffer_Release(&iv_buf);
     return 0;
 }
 

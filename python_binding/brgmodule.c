@@ -119,7 +119,7 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     Py_buffer ibuf;
     AES_RETURN ret = EXIT_FAILURE;
 
-    char *kwlist[] = { "data", "iv", NULL };
+    char *kwlist[] = {"data", "iv", NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &data, &iv))
         return NULL;
@@ -192,7 +192,7 @@ static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     Py_buffer ibuf;
     AES_RETURN ret = EXIT_FAILURE;
 
-    char *kwlist[] = { "data", "iv", NULL };
+    char *kwlist[] = {"data", "iv", NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &data, &iv))
         return NULL;
@@ -264,8 +264,8 @@ static PyObject *reset(brg_aesObject *self)
 
 static PyMethodDef aes_methods[] =
 {
-    {"encrypt", (PyCFunction)encrypt, METH_VARARGS, "encrypts a series of blocks"},
-    {"decrypt", (PyCFunction)decrypt, METH_VARARGS, "decrypts a series of blocks"},
+    { "encrypt", (PyCFunction)encrypt, METH_VARARGS | METH_KEYWORDS, "encrypts a series of blocks" },
+    { "decrypt", (PyCFunction)decrypt, METH_VARARGS | METH_KEYWORDS, "decrypts a series of blocks" },
     {"reset",   (PyCFunction)reset,   METH_NOARGS, "resets the object state"},
     {NULL}  /* Sentinel */
 };

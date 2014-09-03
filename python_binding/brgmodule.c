@@ -63,7 +63,7 @@ typedef struct
     __declspec(align(16)) aes_decrypt_ctx dctx[1];
     __declspec(align(16)) unsigned char iv[AES_BLOCK_SIZE];
     __declspec(align(16)) unsigned char iv_o[AES_BLOCK_SIZE];
-} AES_Object;
+} brg_aesObject;
 
 #else
 
@@ -75,7 +75,7 @@ typedef struct
     aes_decrypt_ctx dctx[1] __attribute__ ((aligned(16)));
     unsigned char iv[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
     unsigned char iv_o[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
-} AES_Object;
+} brg_aesObject;
 
 #endif
 
@@ -109,7 +109,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *AES_encrypt(AES_Object *self, PyObject *args)
+static PyObject *AES_encrypt(brg_aesObject *self, PyObject *args)
 {
     aes_mode mode;
     Py_ssize_t data_len = 0;
@@ -159,7 +159,7 @@ static PyObject *AES_encrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *AES_decrypt(AES_Object *self, PyObject *args)
+static PyObject *AES_decrypt(brg_aesObject *self, PyObject *args)
 {
     aes_mode mode;
     int data_len = 0;
@@ -208,7 +208,7 @@ static PyObject *AES_decrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *AES_reset(AES_Object *self)
+static PyObject *AES_reset(brg_aesObject *self)
 {
     switch(self->mode)
     {
@@ -242,7 +242,7 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
+static int AES_init(brg_aesObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -326,7 +326,7 @@ static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
     int success;
-    AES_Object *self;
+    brg_aesObject *self;
     size_t required_mem, extra, tmp;
 
     required_mem = (size_t)type->tp_basicsize;
@@ -366,12 +366,12 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 
 void secure_free(void *self)
 {
-    memset(self, 0, sizeof(AES_Object));
+    memset(self, 0, sizeof(brg_aesObject));
 #ifdef _MSC_VER
-    VirtualUnlock(self, sizeof(AES_Object));
+    VirtualUnlock(self, sizeof(brg_aesObject));
     _aligned_free(self);
 #else
-    munlock(self, sizeof(AES_Object));
+    munlock(self, sizeof(brg_aesObject));
     free(self);
 #endif
     self = NULL;
@@ -388,8 +388,8 @@ static PyTypeObject brg_aesType =
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
 #endif
-    "AES",                     /*tp_name */
-    sizeof(AES_Object),        /*tp_basicsize */
+    "brg.aes",                 /*tp_name */
+    sizeof(brg_aesObject),     /*tp_basicsize */
     0,                         /*tp_itemsize */
     0,                         /*tp_dealloc */
     0,                         /*tp_print */
@@ -408,12 +408,12 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_as_buffer */
     Py_TPFLAGS_DEFAULT,        /*tp_flags */
     "brg crypto objects",      /*tp_doc */
-    0,		                   /*tp_traverse */
-    0,		                   /*tp_clear */
-    0,		                   /*tp_richcompare */
-    0,		                   /*tp_weaklistoffset */
-    0,		                   /*tp_iter */
-    0,		                   /*tp_iternext */
+    0,		               /*tp_traverse */
+    0,		               /*tp_clear */
+    0,		               /*tp_richcompare */
+    0,		               /*tp_weaklistoffset */
+    0,		               /*tp_iter */
+    0,		               /*tp_iternext */
     aes_methods,               /*tp_methods */
     aes_members,               /*tp_members */
     0,                         /*tp_getset */
@@ -422,7 +422,7 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_descr_get */
     0,                         /*tp_descr_set */
     0,                         /*tp_dictoffset */
-    (initproc)AES_init,     /*tp_init */
+    (initproc)AES_init,        /*tp_init */
     (allocfunc)secure_alloc,   /*tp_alloc */
     (newfunc)PyType_GenericNew,/*tp_new */
     (freefunc)secure_free,     /*tp_free */

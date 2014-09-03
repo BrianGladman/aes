@@ -34,12 +34,17 @@ Issue Date: 30/08/2014
 #  include <malloc.h>
 #  include <intrin.h>
 #  pragma intrinsic( _byteswap_uint64 )
+#  define LITTLE_ENDIAN 1234
+#  define BIG_ENDIAN    4321
+/* Must hard-code these for Windows */
+#  define BYTE_ORDER    LITTLE_ENDIAN
+#  define be64toh(x)    _byteswap_uint64(x)
 #  define strncasecmp _strnicmp
 #endif
 
 #include "aes.h"
 
-typedef enum 
+typedef enum
 {
     AES_MODE_ECB,
     AES_MODE_CBC,
@@ -50,7 +55,7 @@ typedef enum
 
 #ifdef _MSC_VER
 
-typedef struct 
+typedef struct
 {
     PyObject_HEAD
     aes_mode mode;
@@ -58,11 +63,11 @@ typedef struct
     __declspec(align(16)) aes_decrypt_ctx dctx[1];
     __declspec(align(16)) unsigned char iv[AES_BLOCK_SIZE];
     __declspec(align(16)) unsigned char iv_o[AES_BLOCK_SIZE];
-} AES_Object;
+} brg_aesObject;
 
 #else
 
-typedef struct 
+typedef struct
 {
     PyObject_HEAD
     aes_mode mode;
@@ -70,7 +75,7 @@ typedef struct
     aes_decrypt_ctx dctx[1] __attribute__ ((aligned(16)));
     unsigned char iv[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
     unsigned char iv_o[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
-} AES_Object;
+} brg_aesObject;
 
 #endif
 
@@ -79,27 +84,21 @@ This subroutine implements the CTR mode standard incrementing function.
 See NIST Special Publication 800-38A, Appendix B for details:
 http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
 */
-void ctr_inc(unsigned char *cbuf) 
+void ctr_inc(unsigned char *cbuf)
 {
     uint64_t c;
-#ifdef _MSC_VER
-    c = _byteswap_uint64(*(uint64_t *)(cbuf + 8));
-    c++;
-    *(uint64_t *)(cbuf + 8) = _byteswap_uint64(c);
-#else
-# if BYTE_ORDER == LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
     c = be64toh(*(uint64_t *)(cbuf + 8));
     c++;
     *(uint64_t *)(cbuf + 8) = be64toh(c);
-# elif BYTE_ORDER == BIG_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
     /* big endian support? completely untested... */
     c = be64toh(*(uint64_t *)(cbuf + 0));
     c++;
     *(uint64_t *)(cbuf + 0) = be64toh(c);
-# else
+#else
     /* something more exotic? */
     #error "Unsupported byte order"
-# endif
 #endif
     return;
 }
@@ -110,7 +109,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *AES_encrypt(AES_Object *self, PyObject *args) 
+static PyObject *AES_encrypt(brg_aesObject *self, PyObject *args)
 {
     aes_mode mode;
     Py_ssize_t data_len = 0;
@@ -122,14 +121,14 @@ static PyObject *AES_encrypt(AES_Object *self, PyObject *args)
 
     /* Verify constraints based on mode */
     mode = self->mode;
-    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((data_len & 15) != 0)) 
+    if(((mode == AES_MODE_ECB) || (mode == AES_MODE_CBC)) && ((data_len & 15) != 0))
     {
         PyErr_SetString(PyExc_ValueError, "Data size must be a multiple of 16 bytes");
         return NULL;
     }
 
     /* Perform the real encryption operation */
-    switch(mode) 
+    switch(mode)
     {
     case AES_MODE_ECB:
         ret = aes_ecb_encrypt(data, data, (int)data_len, self->ectx);
@@ -150,7 +149,7 @@ static PyObject *AES_encrypt(AES_Object *self, PyObject *args)
     }
 
     /* Verify result and return */
-    if(ret != EXIT_SUCCESS) 
+    if(ret != EXIT_SUCCESS)
     {
         PyErr_SetString(PyExc_ValueError, "Failed to encrypt data");
         return NULL;
@@ -160,7 +159,7 @@ static PyObject *AES_encrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *AES_decrypt(AES_Object *self, PyObject *args) 
+static PyObject *AES_decrypt(brg_aesObject *self, PyObject *args)
 {
     aes_mode mode;
     int data_len = 0;
@@ -178,7 +177,7 @@ static PyObject *AES_decrypt(AES_Object *self, PyObject *args)
     }
 
     /* Perform the real encryption operation */
-    switch(mode) 
+    switch(mode)
     {
     case AES_MODE_ECB:
         ret = aes_ecb_decrypt(data, data, data_len, self->dctx);
@@ -199,7 +198,7 @@ static PyObject *AES_decrypt(AES_Object *self, PyObject *args)
     }
 
     /* Verify result and return */
-    if(ret != EXIT_SUCCESS) 
+    if(ret != EXIT_SUCCESS)
     {
         PyErr_SetString(PyExc_ValueError, "Failed to decrypt data");
         return NULL;
@@ -209,9 +208,9 @@ static PyObject *AES_decrypt(AES_Object *self, PyObject *args)
     return Py_None;
 }
 
-static PyObject *AES_reset(AES_Object *self) 
+static PyObject *AES_reset(brg_aesObject *self)
 {
-    switch(self->mode) 
+    switch(self->mode)
     {
     case AES_MODE_ECB:
         break;
@@ -230,7 +229,7 @@ static PyObject *AES_reset(AES_Object *self)
     return Py_None;
 }
 
-static PyMethodDef aes_methods[] = 
+static PyMethodDef aes_methods[] =
 {
     {"encrypt", (PyCFunction)AES_encrypt, METH_VARARGS, "encrypts a series of blocks"},
     {"decrypt", (PyCFunction)AES_decrypt, METH_VARARGS, "decrypts a series of blocks"},
@@ -238,12 +237,12 @@ static PyMethodDef aes_methods[] =
     {NULL}  /* Sentinel */
 };
 
-static PyMemberDef aes_members[] = 
+static PyMemberDef aes_members[] =
 {
     {NULL}  /* Sentinel */
 };
 
-static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds) 
+static int AES_init(brg_aesObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -255,34 +254,34 @@ static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
         return -1;
     /* determine the operation mode */
     mode_len = strlen(mode);
-    if(strncasecmp(mode, "ecb", mode_len) == 0) 
+    if(strncasecmp(mode, "ecb", mode_len) == 0)
     {
         self->mode = AES_MODE_ECB;
-    } 
-    else if(strncasecmp(mode, "cbc", mode_len) == 0) 
+    }
+    else if(strncasecmp(mode, "cbc", mode_len) == 0)
     {
         self->mode = AES_MODE_CBC;
-    } 
-    else if(strncasecmp(mode, "cfb", mode_len) == 0) 
+    }
+    else if(strncasecmp(mode, "cfb", mode_len) == 0)
     {
         self->mode = AES_MODE_CFB;
-    } 
-    else if(strncasecmp(mode, "ofb", mode_len) == 0) 
+    }
+    else if(strncasecmp(mode, "ofb", mode_len) == 0)
     {
         self->mode = AES_MODE_OFB;
-    } 
-    else if(strncasecmp(mode, "ctr", mode_len) == 0) 
+    }
+    else if(strncasecmp(mode, "ctr", mode_len) == 0)
     {
         self->mode = AES_MODE_CTR;
-    } 
-    else 
+    }
+    else
     {
         PyErr_SetString(PyExc_ValueError, "Unsupported AES mode");
         return -1;
     }
-    
+   
     /* ensure required parameters have been passed */
-    switch(self->mode) 
+    switch(self->mode)
     {
     case AES_MODE_ECB:
         // no additional parameters are required for ECB mode
@@ -291,7 +290,7 @@ static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
     case AES_MODE_CFB:
     case AES_MODE_OFB:
     case AES_MODE_CTR:
-        if(iv_len != AES_BLOCK_SIZE) 
+        if(iv_len != AES_BLOCK_SIZE)
         {
             PyErr_SetString(PyExc_ValueError, "A 16-byte IV must be supplied for this mode");
             return -1;
@@ -302,7 +301,7 @@ static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
         break;
     }
     /* validate key length and initialize encryption / decryption states */
-    switch(key_len) 
+    switch(key_len)
     {
     case 16:
         aes_encrypt_key128(key, self->ectx);
@@ -324,14 +323,14 @@ static int AES_init(AES_Object *self, PyObject *args, PyObject *kwds)
 }
 
 /* https://docs.python.org/2/c-api/typeobj.html#PyTypeObject.tp_alloc */
-static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems) 
+static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
     int success;
-    AES_Object *self;
+    brg_aesObject *self;
     size_t required_mem, extra, tmp;
 
     required_mem = (size_t)type->tp_basicsize;
-    if(type->tp_itemsize != 0) 
+    if(type->tp_itemsize != 0)
     {
         extra = Py_SIZE(type) * type->tp_itemsize;
         /* round up to a multiple of sizeof(void *) */
@@ -365,14 +364,14 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
     return (PyObject *)self;
 }
 
-void secure_free(void *self) 
+void secure_free(void *self)
 {
-    memset(self, 0, sizeof(AES_Object));
+    memset(self, 0, sizeof(brg_aesObject));
 #ifdef _MSC_VER
-    VirtualUnlock(self, sizeof(AES_Object));
+    VirtualUnlock(self, sizeof(brg_aesObject));
     _aligned_free(self);
 #else
-    munlock(self, sizeof(AES_Object));
+    munlock(self, sizeof(brg_aesObject));
     free(self);
 #endif
     self = NULL;
@@ -389,8 +388,8 @@ static PyTypeObject brg_aesType =
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
 #endif
-    "AES",                     /*tp_name */
-    sizeof(AES_Object),        /*tp_basicsize */
+    "brg.aes",                 /*tp_name */
+    sizeof(brg_aesObject),     /*tp_basicsize */
     0,                         /*tp_itemsize */
     0,                         /*tp_dealloc */
     0,                         /*tp_print */
@@ -409,12 +408,12 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_as_buffer */
     Py_TPFLAGS_DEFAULT,        /*tp_flags */
     "brg crypto objects",      /*tp_doc */
-    0,		                   /*tp_traverse */
-    0,		                   /*tp_clear */
-    0,		                   /*tp_richcompare */
-    0,		                   /*tp_weaklistoffset */
-    0,		                   /*tp_iter */
-    0,		                   /*tp_iternext */
+    0,		               /*tp_traverse */
+    0,		               /*tp_clear */
+    0,		               /*tp_richcompare */
+    0,		               /*tp_weaklistoffset */
+    0,		               /*tp_iter */
+    0,		               /*tp_iternext */
     aes_methods,               /*tp_methods */
     aes_members,               /*tp_members */
     0,                         /*tp_getset */
@@ -423,14 +422,14 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_descr_get */
     0,                         /*tp_descr_set */
     0,                         /*tp_dictoffset */
-    (initproc)AES_init,     /*tp_init */
+    (initproc)AES_init,        /*tp_init */
     (allocfunc)secure_alloc,   /*tp_alloc */
     (newfunc)PyType_GenericNew,/*tp_new */
     (freefunc)secure_free,     /*tp_free */
 };
 
 /* module methods (none for now) */
-static PyMethodDef brg_methods[] = 
+static PyMethodDef brg_methods[] =
 {
     {NULL}  /* Sentinel */
 };
@@ -440,10 +439,10 @@ static PyMethodDef brg_methods[] =
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-static struct PyModuleDef moduledef = 
+static struct PyModuleDef moduledef =
 {
     PyModuleDef_HEAD_INIT,
-    "AES",              /* m_name     */
+    "brg",              /* m_name     */
     "Python Bindings",  /* m_doc      */
     -1,                 /* m_size     */
     brg_methods,        /* m_methods  */
@@ -455,27 +454,28 @@ static struct PyModuleDef moduledef =
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-  PyMODINIT_FUNC PyInit_aes(void)
+  PyMODINIT_FUNC PyInit_brg(void)
 #else
-  PyMODINIT_FUNC init_aes(void)
+  PyMODINIT_FUNC initbrg(void)
 #endif
 
 {
     PyObject *m;
 
     /* brg_aesType.tp_new = PyType_GenericNew; */
+#if PY_MAJOR_VERSION >= 3
     if (PyType_Ready(&brg_aesType) < 0)
         return NULL;
-
-#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
     Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
     return m;
 #else
+    if (PyType_Ready(&brg_aesType) < 0)
+        return;
     m = Py_InitModule3("brg", brg_methods,
                        "Python bindings for Brian Gladman's crypto code");
     Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    PyModule_AddObject(m, "aes", (PyObject *)&brg_aesType);
 #endif
 }

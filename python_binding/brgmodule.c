@@ -320,7 +320,7 @@ static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_ValueError, "Unsupported AES mode");
         return -1;
     }
-   
+
 
     /* validate key length and initialize encryption / decryption states */
     switch(key_buf.len)
@@ -412,7 +412,7 @@ static PyTypeObject brg_aesType =
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
 #endif
-    "brg.aes",                 /*tp_name */
+    "aes.AES",                 /*tp_name */
     sizeof(brg_aesObject),     /*tp_basicsize */
     0,                         /*tp_itemsize */
     0,                         /*tp_dealloc */
@@ -431,7 +431,7 @@ static PyTypeObject brg_aesType =
     0,                         /*tp_setattro */
     0,                         /*tp_as_buffer */
     Py_TPFLAGS_DEFAULT,        /*tp_flags */
-    "brg crypto objects",      /*tp_doc */
+    "AES objects",             /*tp_doc */
     0,		               /*tp_traverse */
     0,		               /*tp_clear */
     0,		               /*tp_richcompare */
@@ -475,7 +475,6 @@ static struct PyModuleDef moduledef =
     NULL,               /* m_clear    */
     NULL,               /* m_free     */
 };
-#endif
 
 PyMODINIT_FUNC PyInit_aes(void)
 {
@@ -490,3 +489,21 @@ PyMODINIT_FUNC PyInit_aes(void)
     PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
     return m;
 }
+
+#else
+
+PyMODINIT_FUNC initaes(void) {
+    PyObject *m;
+
+    /*brg_aesType.tp_new = PyType_GenericNew;*/
+    if (PyType_Ready(&brg_aesType) < 0)
+        return;
+
+    m = Py_InitModule3("aes", brg_methods,
+                       "Python bindings for Brian Gladman's AES code");
+
+    Py_INCREF(&brg_aesType);
+    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+}
+
+#endif

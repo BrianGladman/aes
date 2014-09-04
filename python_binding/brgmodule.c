@@ -122,19 +122,34 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     char *kwlist[] = {"data", "iv", NULL};
 
     if(!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &data, &iv))
+    {
+        PyErr_SetString(PyExc_ValueError, "Failed to parse arguments");
         return NULL;
+    }
 
     if(!PyObject_CheckBuffer(data))
+    {
+        PyErr_SetString(PyExc_ValueError, "Check failed for data buffer");
         return NULL;
+    }
 
     if(PyObject_GetBuffer(data, &dbuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Failed to get data buffer");
         return NULL;
+    }
 
     if(!PyObject_CheckBuffer(iv))
+    {
+        PyErr_SetString(PyExc_ValueError, "Check failed for IV buffer");
         return NULL;
+    }
 
     if(PyObject_GetBuffer(iv, &ibuf, PyBUF_WRITABLE | PyBUF_C_CONTIGUOUS) < 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Failed to get IV buffer");
         return NULL;
+    }
 
     /* Verify constraints based on mode */
     mode = self->mode;

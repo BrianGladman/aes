@@ -1,29 +1,11 @@
 This README describes the Python bindings for Brian Gladman's AES module.
 
+These bindings are compatible with Python 2.7+ (including Python 3).
+
 You can build a binary distribution like this:
     $ python setup.py bdist
 
 Or, for development work:
     $ python setup.py build_ext --inplace
 
-Usage is fairly straightforward:
-
-#!/usr/bin/python
-
-from aes import AES
-from os import urandom
-
-random_iv = bytearray(urandom(16))
-random_key = bytearray(urandom(16))
-
-data = bytearray(range(256))
-data1 = data[:151]
-data2 = data[151:]
-
-aes_ctr = AES(mode='ctr', key=random_key, iv=random_iv)
-aes_ctr.encrypt(data1)
-aes_ctr.encrypt(data2)
-
-data = data1 + data2
-aes_ctr = AES(mode='ctr', key=random_key, iv=random_iv)
-aes_ctr.decrypt(data)
+Usage is fairly straightforward; see demo.py for an example.

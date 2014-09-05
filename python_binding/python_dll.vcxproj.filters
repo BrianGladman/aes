@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\brgmodule.c">
+    <ClCompile Include="..\aesmodule.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

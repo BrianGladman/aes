@@ -64,7 +64,7 @@ typedef struct
     __declspec(align(16)) aes_decrypt_ctx dctx[1];
     __declspec(align(16)) unsigned char iv[AES_BLOCK_SIZE];
     __declspec(align(16)) unsigned char iv_o[AES_BLOCK_SIZE];
-} brg_aesObject;
+} aes_AESObject;
 
 #else
 
@@ -76,7 +76,7 @@ typedef struct
     aes_decrypt_ctx dctx[1] __attribute__ ((aligned(16)));
     unsigned char iv[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
     unsigned char iv_o[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
-} brg_aesObject;
+} aes_AESObject;
 
 #endif
 
@@ -110,7 +110,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -178,7 +178,7 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     return Py_None;
 }
 
-static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -245,7 +245,7 @@ static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     return Py_None;
 }
 
-static PyObject *reset(brg_aesObject *self)
+static PyObject *reset(aes_AESObject *self)
 {
     switch(self->mode) {
     case AES_MODE_ECB:
@@ -278,7 +278,7 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static int init(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -388,7 +388,7 @@ static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
     int success;
-    brg_aesObject *self;
+    aes_AESObject *self;
     size_t required_mem, extra, tmp;
 
     required_mem = (size_t)type->tp_basicsize;
@@ -428,12 +428,12 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 
 void secure_free(void *self)
 {
-    memset(self, 0, sizeof(brg_aesObject));
+    memset(self, 0, sizeof(aes_AESObject));
 #ifdef _MSC_VER
-    VirtualUnlock(self, sizeof(brg_aesObject));
+    VirtualUnlock(self, sizeof(aes_AESObject));
     _aligned_free(self);
 #else
-    munlock(self, sizeof(brg_aesObject));
+    munlock(self, sizeof(aes_AESObject));
     free(self);
 #endif
     self = NULL;
@@ -451,7 +451,7 @@ static PyTypeObject brg_aesType =
     0,                         /*ob_size */
 #endif
     "aes.AES",                 /*tp_name */
-    sizeof(brg_aesObject),     /*tp_basicsize */
+    sizeof(aes_AESObject),     /*tp_basicsize */
     0,                         /*tp_itemsize */
     0,                         /*tp_dealloc */
     0,                         /*tp_print */

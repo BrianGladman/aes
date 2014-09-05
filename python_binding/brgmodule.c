@@ -441,11 +441,11 @@ void secure_free(void *self)
 }
 
 #if PY_MAJOR_VERSION >= 3
-static PyTypeObject brg_aesType =
+static PyTypeObject aes_AESType =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
 #else
-static PyTypeObject brg_aesType =
+static PyTypeObject aes_AESType =
 {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
@@ -518,13 +518,13 @@ PyMODINIT_FUNC PyInit_aes(void)
 {
     PyObject *m;
 
-    /* brg_aesType.tp_new = PyType_GenericNew; */
-    if (PyType_Ready(&brg_aesType) < 0)
+    /* aes_AESType.tp_new = PyType_GenericNew; */
+    if (PyType_Ready(&aes_AESType) < 0)
         return NULL;
 
     m = PyModule_Create(&moduledef);
-    Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    Py_INCREF(&aes_AESType);
+    PyModule_AddObject(m, "AES", (PyObject *)&aes_AESType);
     return m;
 }
 
@@ -533,15 +533,15 @@ PyMODINIT_FUNC PyInit_aes(void)
 PyMODINIT_FUNC initaes(void) {
     PyObject *m;
 
-    /*brg_aesType.tp_new = PyType_GenericNew;*/
-    if (PyType_Ready(&brg_aesType) < 0)
+    /*aes_AESType.tp_new = PyType_GenericNew;*/
+    if (PyType_Ready(&aes_AESType) < 0)
         return;
 
     m = Py_InitModule3("aes", brg_methods,
                        "Python bindings for Brian Gladman's AES code");
 
-    Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    Py_INCREF(&aes_AESType);
+    PyModule_AddObject(m, "AES", (PyObject *)&aes_AESType);
 }
 
 #endif

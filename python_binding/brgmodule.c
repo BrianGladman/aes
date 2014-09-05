@@ -265,7 +265,7 @@ static PyObject *reset(aes_AESObject *self)
     return Py_None;
 }
 
-static PyMethodDef aes_methods[] =
+static PyMethodDef aes_AESmethods[] =
 {
     { "encrypt", (PyCFunction)encrypt, METH_VARARGS | METH_KEYWORDS, "encrypts a series of blocks" },
     { "decrypt", (PyCFunction)decrypt, METH_VARARGS | METH_KEYWORDS, "decrypts a series of blocks" },
@@ -476,7 +476,7 @@ static PyTypeObject aes_AESType =
     0,		               /*tp_weaklistoffset */
     0,		               /*tp_iter */
     0,		               /*tp_iternext */
-    aes_methods,               /*tp_methods */
+    aes_AESmethods,            /*tp_methods */
     aes_members,               /*tp_members */
     0,                         /*tp_getset */
     0,                         /*tp_base */
@@ -491,7 +491,7 @@ static PyTypeObject aes_AESType =
 };
 
 /* module methods (none for now) */
-static PyMethodDef brg_methods[] =
+static PyMethodDef aes_methods[] =
 {
     {NULL}  /* Sentinel */
 };
@@ -507,7 +507,7 @@ static struct PyModuleDef moduledef =
     "AES",              /* m_name     */
     "Python Bindings",  /* m_doc      */
     -1,                 /* m_size     */
-    brg_methods,        /* m_methods  */
+    aes_methods,        /* m_methods  */
     NULL,               /* m_reload   */
     NULL,               /* m_traverse */
     NULL,               /* m_clear    */
@@ -537,7 +537,7 @@ PyMODINIT_FUNC initaes(void) {
     if (PyType_Ready(&aes_AESType) < 0)
         return;
 
-    m = Py_InitModule3("aes", brg_methods,
+    m = Py_InitModule3("aes", aes_methods,
                        "Python bindings for Brian Gladman's AES code");
 
     Py_INCREF(&aes_AESType);

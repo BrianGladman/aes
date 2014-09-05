@@ -40,6 +40,7 @@ Issue Date: 30/08/2014
 /* Must hard-code these for Windows */
 #  define BYTE_ORDER    LITTLE_ENDIAN
 #  define be64toh(x)    _byteswap_uint64(x)
+#  define htobe64(x)    _byteswap_uint64(x)
 #  define strncasecmp _strnicmp
 #endif
 
@@ -91,12 +92,12 @@ void ctr_inc(unsigned char *cbuf)
 #if BYTE_ORDER == LITTLE_ENDIAN
     c = be64toh(*(uint64_t *)(cbuf + 8));
     c++;
-    *(uint64_t *)(cbuf + 8) = be64toh(c);
+    *(uint64_t *)(cbuf + 8) = htobe64(c);
 #elif BYTE_ORDER == BIG_ENDIAN
     /* big endian support? completely untested... */
     c = be64toh(*(uint64_t *)(cbuf + 0));
     c++;
-    *(uint64_t *)(cbuf + 0) = be64toh(c);
+    *(uint64_t *)(cbuf + 0) = htobe64(c);
 #else
     /* something more exotic? */
     #error "Unsupported byte order"

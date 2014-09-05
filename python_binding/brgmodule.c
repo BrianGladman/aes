@@ -40,6 +40,7 @@ Issue Date: 30/08/2014
 /* Must hard-code these for Windows */
 #  define BYTE_ORDER    LITTLE_ENDIAN
 #  define be64toh(x)    _byteswap_uint64(x)
+#  define htobe64(x)    _byteswap_uint64(x)
 #  define strncasecmp _strnicmp
 #endif
 
@@ -64,7 +65,7 @@ typedef struct
     __declspec(align(16)) aes_decrypt_ctx dctx[1];
     __declspec(align(16)) unsigned char iv[AES_BLOCK_SIZE];
     __declspec(align(16)) unsigned char iv_o[AES_BLOCK_SIZE];
-} brg_aesObject;
+} aes_AESObject;
 
 #else
 
@@ -76,7 +77,7 @@ typedef struct
     aes_decrypt_ctx dctx[1] __attribute__ ((aligned(16)));
     unsigned char iv[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
     unsigned char iv_o[AES_BLOCK_SIZE] __attribute__ ((aligned(16)));
-} brg_aesObject;
+} aes_AESObject;
 
 #endif
 
@@ -91,12 +92,12 @@ void ctr_inc(unsigned char *cbuf)
 #if BYTE_ORDER == LITTLE_ENDIAN
     c = be64toh(*(uint64_t *)(cbuf + 8));
     c++;
-    *(uint64_t *)(cbuf + 8) = be64toh(c);
+    *(uint64_t *)(cbuf + 8) = htobe64(c);
 #elif BYTE_ORDER == BIG_ENDIAN
     /* big endian support? completely untested... */
     c = be64toh(*(uint64_t *)(cbuf + 0));
     c++;
-    *(uint64_t *)(cbuf + 0) = be64toh(c);
+    *(uint64_t *)(cbuf + 0) = htobe64(c);
 #else
     /* something more exotic? */
     #error "Unsupported byte order"
@@ -110,7 +111,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -178,7 +179,7 @@ static PyObject *encrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     return Py_None;
 }
 
-static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -245,7 +246,7 @@ static PyObject *decrypt(brg_aesObject *self, PyObject *args, PyObject *kwds)
     return Py_None;
 }
 
-static PyObject *reset(brg_aesObject *self)
+static PyObject *reset(aes_AESObject *self)
 {
     switch(self->mode) {
     case AES_MODE_ECB:
@@ -265,7 +266,7 @@ static PyObject *reset(brg_aesObject *self)
     return Py_None;
 }
 
-static PyMethodDef aes_methods[] =
+static PyMethodDef aes_AESmethods[] =
 {
     { "encrypt", (PyCFunction)encrypt, METH_VARARGS | METH_KEYWORDS, "encrypts a series of blocks" },
     { "decrypt", (PyCFunction)decrypt, METH_VARARGS | METH_KEYWORDS, "decrypts a series of blocks" },
@@ -278,7 +279,7 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
+static int init(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -388,7 +389,7 @@ static int init(brg_aesObject *self, PyObject *args, PyObject *kwds)
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
     int success;
-    brg_aesObject *self;
+    aes_AESObject *self;
     size_t required_mem, extra, tmp;
 
     required_mem = (size_t)type->tp_basicsize;
@@ -428,12 +429,12 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 
 void secure_free(void *self)
 {
-    memset(self, 0, sizeof(brg_aesObject));
+    memset(self, 0, sizeof(aes_AESObject));
 #ifdef _MSC_VER
-    VirtualUnlock(self, sizeof(brg_aesObject));
+    VirtualUnlock(self, sizeof(aes_AESObject));
     _aligned_free(self);
 #else
-    munlock(self, sizeof(brg_aesObject));
+    munlock(self, sizeof(aes_AESObject));
     free(self);
 #endif
     self = NULL;
@@ -441,17 +442,17 @@ void secure_free(void *self)
 }
 
 #if PY_MAJOR_VERSION >= 3
-static PyTypeObject brg_aesType =
+static PyTypeObject aes_AESType =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
 #else
-static PyTypeObject brg_aesType =
+static PyTypeObject aes_AESType =
 {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size */
 #endif
     "aes.AES",                 /*tp_name */
-    sizeof(brg_aesObject),     /*tp_basicsize */
+    sizeof(aes_AESObject),     /*tp_basicsize */
     0,                         /*tp_itemsize */
     0,                         /*tp_dealloc */
     0,                         /*tp_print */
@@ -476,7 +477,7 @@ static PyTypeObject brg_aesType =
     0,		               /*tp_weaklistoffset */
     0,		               /*tp_iter */
     0,		               /*tp_iternext */
-    aes_methods,               /*tp_methods */
+    aes_AESmethods,            /*tp_methods */
     aes_members,               /*tp_members */
     0,                         /*tp_getset */
     0,                         /*tp_base */
@@ -491,7 +492,7 @@ static PyTypeObject brg_aesType =
 };
 
 /* module methods (none for now) */
-static PyMethodDef brg_methods[] =
+static PyMethodDef aes_methods[] =
 {
     {NULL}  /* Sentinel */
 };
@@ -507,7 +508,7 @@ static struct PyModuleDef moduledef =
     "AES",              /* m_name     */
     "Python Bindings",  /* m_doc      */
     -1,                 /* m_size     */
-    brg_methods,        /* m_methods  */
+    aes_methods,        /* m_methods  */
     NULL,               /* m_reload   */
     NULL,               /* m_traverse */
     NULL,               /* m_clear    */
@@ -518,13 +519,13 @@ PyMODINIT_FUNC PyInit_aes(void)
 {
     PyObject *m;
 
-    /* brg_aesType.tp_new = PyType_GenericNew; */
-    if (PyType_Ready(&brg_aesType) < 0)
+    /* aes_AESType.tp_new = PyType_GenericNew; */
+    if (PyType_Ready(&aes_AESType) < 0)
         return NULL;
 
     m = PyModule_Create(&moduledef);
-    Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    Py_INCREF(&aes_AESType);
+    PyModule_AddObject(m, "AES", (PyObject *)&aes_AESType);
     return m;
 }
 
@@ -533,15 +534,15 @@ PyMODINIT_FUNC PyInit_aes(void)
 PyMODINIT_FUNC initaes(void) {
     PyObject *m;
 
-    /*brg_aesType.tp_new = PyType_GenericNew;*/
-    if (PyType_Ready(&brg_aesType) < 0)
+    /*aes_AESType.tp_new = PyType_GenericNew;*/
+    if (PyType_Ready(&aes_AESType) < 0)
         return;
 
-    m = Py_InitModule3("aes", brg_methods,
+    m = Py_InitModule3("aes", aes_methods,
                        "Python bindings for Brian Gladman's AES code");
 
-    Py_INCREF(&brg_aesType);
-    PyModule_AddObject(m, "AES", (PyObject *)&brg_aesType);
+    Py_INCREF(&aes_AESType);
+    PyModule_AddObject(m, "AES", (PyObject *)&aes_AESType);
 }
 
 #endif

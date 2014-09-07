@@ -1,6 +1,7 @@
 /*
 ---------------------------------------------------------------------------
 Copyright (c) 2014, Michael Mohr, San Jose, CA, USA. All rights reserved.
+Copyright (c) 2014, Brian Gladman, Worcester, UK. All rights reserved.
 
 The redistribution and use of this software (with or without changes)
 is allowed without the payment of fees or royalties provided that:
@@ -45,6 +46,9 @@ Issue Date: 30/08/2014
 #endif
 
 #include "aes.h"
+#if defined( __PROFILE_AES__ )
+#include "rdtsc.h"
+#endif
 
 typedef enum
 {
@@ -117,6 +121,9 @@ static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
     PyObject *data;
     Py_buffer dbuf;
     AES_RETURN ret = EXIT_FAILURE;
+#if defined( __PROFILE_AES__ )
+    unsigned long long enter = 0, exit = 0;
+#endif
 
     char *kwlist[] = {"data", NULL};
 
@@ -147,6 +154,9 @@ static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
     }
 
     /* Perform the real encryption operation */
+#if defined( __PROFILE_AES__ )
+    enter = read_tsc();
+#endif
     switch(mode)
     {
     case AES_MODE_ECB:
@@ -166,6 +176,9 @@ static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
         ret = aes_ctr_encrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, self->iv, ctr_inc, self->ectx);
         break;
     }
+#if defined( __PROFILE_AES__ )
+    exit = read_tsc();
+#endif
 
     PyBuffer_Release(&dbuf);
     /* Verify result and return */
@@ -175,8 +188,12 @@ static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
+#if defined( __PROFILE_AES__ )
+    return PyLong_FromUnsignedLongLong(exit - enter);
+#else
     Py_INCREF(Py_None);
     return Py_None;
+#endif
 }
 
 static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
@@ -185,6 +202,9 @@ static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
     PyObject *data;
     Py_buffer dbuf;
     AES_RETURN ret = EXIT_FAILURE;
+#if defined( __PROFILE_AES__ )
+    unsigned long long enter = 0, exit = 0;
+#endif
 
     char *kwlist[] = {"data", NULL};
 
@@ -214,6 +234,9 @@ static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
     }
 
     /* Perform the real encryption operation */
+#if defined( __PROFILE_AES__ )
+    enter = read_tsc();
+#endif
     switch(mode)
     {
     case AES_MODE_ECB:
@@ -233,6 +256,9 @@ static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
         ret = aes_ctr_decrypt(dbuf.buf, dbuf.buf, (int)dbuf.len, self->iv, ctr_inc, self->ectx);
         break;
     }
+#if defined( __PROFILE_AES__ )
+    exit = read_tsc();
+#endif
 
     PyBuffer_Release(&dbuf);
     /* Verify result and return */
@@ -242,8 +268,12 @@ static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
+#if defined( __PROFILE_AES__ )
+    return PyLong_FromUnsignedLongLong(exit - enter);
+#else
     Py_INCREF(Py_None);
     return Py_None;
+#endif
 }
 
 static PyObject *reset(aes_AESObject *self)

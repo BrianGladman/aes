@@ -1,8 +1,16 @@
+import os, psutil
 from aes import AES
-from os import urandom
 
-random_iv = bytearray(urandom(16))
-random_key = bytearray(urandom(16))
+# Pin the Python process to CPU 0 to measure performance
+# Note: this code works for psutil 1.2.x, not 2.x!
+cpu_count = psutil.NUM_CPUS
+p = psutil.Process(os.getpid())
+p.set_cpu_affinity([0])
+
+# Perform several encryption / decryption operations
+
+random_iv = bytearray(os.urandom(16))
+random_key = bytearray(os.urandom(16))
 
 data = bytearray(range(256))
 data1 = data[:151]

@@ -26,7 +26,7 @@ Issue Date: 20/12/2007
     static inline volatile unsigned long long read_tsc(void)
     {
         unsigned int cyl, cyh;
-        __asm__ __volatile__("cpuid; rdtsc":"=a"(cyl),"=d"(cyh));
+        __asm__ __volatile__("movl $0, %%eax; cpuid; rdtsc":"=a"(cyl),"=d"(cyh)::"ebx","ecx");
         return ((unsigned long long)cyh << 32) | cyl;
     }
 

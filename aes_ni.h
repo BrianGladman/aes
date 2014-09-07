@@ -20,7 +20,6 @@ Issue Date: 13/11/2013
 #ifndef AES_NI_H
 #define AES_NI_H
 
-#include <intrin.h>
 #include "aesopt.h"
 
 #if defined( USE_INTEL_AES_IF_PRESENT )

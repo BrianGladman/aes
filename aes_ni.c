@@ -17,26 +17,60 @@ and fitness for purpose.
 Issue Date: 13/11/2013
 */
 
-#include <intrin.h>
 #include "aes_ni.h"
 
 #if defined( USE_INTEL_AES_IF_PRESENT )
 
-#pragma intrinsic(__cpuid)
+#if defined(_MSC_VER)
 
-__inline int has_aes_ni()
+#include <intrin.h>
+#pragma intrinsic(__cpuid)
+#define cpuid __cpuid
+#define INLINE  __inline
+
+INLINE int has_aes_ni()
 {
 	static int test = -1;
-	int cpu_info[4];
 	if(test < 0)
 	{
-		__cpuid(cpu_info, 1);
+        int cpu_info[4];
+        __cpuid(cpu_info, 1);
 		test = cpu_info[2] & 0x02000000;
 	}
 	return test;
 }
 
-__inline __m128i aes_128_assist(__m128i t1, __m128i t2)
+#elif defined( __GNUC__ )
+
+#pragma GCC target ("ssse3")
+#pragma GCC target ("sse4.1")
+#pragma GCC target ("aes")
+#include <wmmintrin.h>
+#include <smmintrin.h>
+#define INLINE  static __inline
+
+#define cpuid(func, ax, bx, cx, dx)		\
+	__asm__ __volatile__("cpuid":		\
+	"=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
+
+INLINE int has_aes_ni()
+{
+    static int test = -1;
+    if(test < 0)
+    {
+        static int test = -1;
+        unsigned int a, b, c, d;
+        cpuid(1, a, b, c, d);
+        test = (c & 0x2000000);
+    }
+    return test;
+}
+
+#else
+#error AES New Instructions require Microsoft, Intel or GNU C
+#endif
+
+INLINE __m128i aes_128_assist(__m128i t1, __m128i t2)
 {
 	__m128i t3;
 	t2 = _mm_shuffle_epi32(t2, 0xff);
@@ -68,39 +102,39 @@ AES_RETURN aes_ni(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
 	t2 = _mm_aeskeygenassist_si128(t1, 0x1);
 	t1 = aes_128_assist(t1, t2);
 	ks[1] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x2);
 	t1 = aes_128_assist(t1, t2);
 	ks[2] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x4);
 	t1 = aes_128_assist(t1, t2);
 	ks[3] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x8);
 	t1 = aes_128_assist(t1, t2);
 	ks[4] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x10);
 	t1 = aes_128_assist(t1, t2);
 	ks[5] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x20);
 	t1 = aes_128_assist(t1, t2);
 	ks[6] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x40);
 	t1 = aes_128_assist(t1, t2);
 	ks[7] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x80);
 	t1 = aes_128_assist(t1, t2);
 	ks[8] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x1b);
 	t1 = aes_128_assist(t1, t2);
 	ks[9] = t1;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t1, 0x36);
 	t1 = aes_128_assist(t1, t2);
 	ks[10] = t1;
@@ -110,7 +144,7 @@ AES_RETURN aes_ni(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
 	return EXIT_SUCCESS;
 }
 
-__inline void aes_192_assist(__m128i* t1, __m128i * t2, __m128i * t3)
+INLINE void aes_192_assist(__m128i* t1, __m128i * t2, __m128i * t3)
 {
 	__m128i t4;
 	*t2 = _mm_shuffle_epi32(*t2, 0x55);
@@ -143,43 +177,43 @@ AES_RETURN aes_ni(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
 
 	ks[0] = t1;
 	ks[1] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x1);
 	aes_192_assist(&t1, &t2, &t3);
 
 	ks[1] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(ks[1]), _mm_castsi128_pd(t1), 0));
 	ks[2] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(t1), _mm_castsi128_pd(t3), 1));
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x2);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[3] = t1;
 	ks[4] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x4);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[4] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(ks[4]), _mm_castsi128_pd(t1), 0));
 	ks[5] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(t1), _mm_castsi128_pd(t3), 1));
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x8);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[6] = t1;
 	ks[7] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x10);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[7] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(ks[7]), _mm_castsi128_pd(t1), 0));
 	ks[8] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(t1), _mm_castsi128_pd(t3), 1));
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x20);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[9] = t1;
 	ks[10] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x40);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[10] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(ks[10]), _mm_castsi128_pd(t1), 0));
 	ks[11] = _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(t1), _mm_castsi128_pd(t3), 1));
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x80);
 	aes_192_assist(&t1, &t2, &t3);
 	ks[12] = t1;
@@ -189,7 +223,7 @@ AES_RETURN aes_ni(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
 	return EXIT_SUCCESS;
 }
 
-__inline void aes_256_assist1(__m128i* t1, __m128i * t2)
+INLINE void aes_256_assist1(__m128i* t1, __m128i * t2)
 {
 	__m128i t4;
 	*t2 = _mm_shuffle_epi32(*t2, 0xff);
@@ -202,7 +236,7 @@ __inline void aes_256_assist1(__m128i* t1, __m128i * t2)
 	*t1 = _mm_xor_si128(*t1, *t2);
 }
 
-__inline void aes_256_assist2(__m128i* t1, __m128i * t3)
+INLINE void aes_256_assist2(__m128i* t1, __m128i * t3)
 {
 	__m128i t2, t4;
 	t4 = _mm_aeskeygenassist_si128(*t1, 0x0);
@@ -232,7 +266,7 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 
 	ks[0] = t1;
 	ks[1] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x01);
 	aes_256_assist1(&t1, &t2);
 	ks[2] = t1;
@@ -244,31 +278,31 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 	ks[4] = t1;
 	aes_256_assist2(&t1, &t3);
 	ks[5] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x04);
 	aes_256_assist1(&t1, &t2);
 	ks[6] = t1;
 	aes_256_assist2(&t1, &t3);
 	ks[7] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x08);
 	aes_256_assist1(&t1, &t2);
 	ks[8] = t1;
 	aes_256_assist2(&t1, &t3);
 	ks[9] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x10);
 	aes_256_assist1(&t1, &t2);
 	ks[10] = t1;
 	aes_256_assist2(&t1, &t3);
 	ks[11] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x20);
 	aes_256_assist1(&t1, &t2);
 	ks[12] = t1;
 	aes_256_assist2(&t1, &t3);
 	ks[13] = t3;
-	
+
 	t2 = _mm_aeskeygenassist_si128(t3, 0x40);
 	aes_256_assist1(&t1, &t2);
 	ks[14] = t1;
@@ -278,7 +312,7 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 	return EXIT_SUCCESS;
 }
 
-__inline void enc_to_dec(aes_decrypt_ctx cx[1])
+INLINE void enc_to_dec(aes_decrypt_ctx cx[1])
 {
 	__m128i *ks = (__m128i*)cx->ks;
 	int j;
@@ -427,7 +461,8 @@ void aes_CBC_encrypt(const unsigned char *in,
 	int number_of_rounds)
 {
 	__m128i feedback, data;
-	int i, j;
+	unsigned long i;
+	int j;
 	if(length % 16)
 		length = length / 16 + 1;
 	else length /= 16;
@@ -452,7 +487,8 @@ void aes_CBC_decrypt(const unsigned char *in,
 	int number_of_rounds)
 {
 	__m128i data, feedback, last_in;
-	int i, j;
+	unsigned long i;
+	int j;
 	if(length % 16)
 		length = length / 16 + 1;
 	else length /= 16;
@@ -481,7 +517,8 @@ void AES_CTR_encrypt(const unsigned char *in,
 	int number_of_rounds)
 {
 	__m128i ctr_block = { 0 }, tmp, ONE, BSWAP_EPI64;
-	int i, j;
+	unsigned long i;
+	int j;
 	if(length % 16)
 		length = length / 16 + 1;
 	else length /= 16;

@@ -174,7 +174,7 @@ Issue Date: 20/12/2007
 #endif
 
 /*  Define this option if support for the Intel AESNI is required (not
-    currently available with GCC). If USE_INTEL_AES_IF_PRESENT is defined
+    currently available with GCC). If USE_INTEL_AES_IF_PRESENT is defined 
     then AESNI will be used if it is detected (both present and enabled).
 
 	AESNI uses a decryption key schedule with the first decryption
@@ -342,7 +342,7 @@ Issue Date: 20/12/2007
 
 /*  9. MASKING OR CASTING FROM LONGER VALUES TO BYTES
 
-    In some systems it is better to mask longer values to extract bytes
+    In some systems it is better to mask longer values to extract bytes 
     rather than using a cast. This option allows this choice.
 */
 #if 0
@@ -683,7 +683,7 @@ Issue Date: 20/12/2007
 #if !(defined( REDUCE_CODE_SIZE ) && (defined( ASM_X86_V2 ) || defined( ASM_X86_V2C )))
 #  if ((FUNCS_IN_C & ENC_KEYING_IN_C) || (FUNCS_IN_C & DEC_KEYING_IN_C))
 #    if KEY_SCHED == ONE_TABLE
-#      if !defined( FL1_SET )  && !defined( FL4_SET )
+#      if !defined( FL1_SET )  && !defined( FL4_SET ) 
 #        define LS1_SET
 #      endif
 #    elif KEY_SCHED == FOUR_TABLES
@@ -732,7 +732,7 @@ Issue Date: 20/12/2007
 /* perform forward and inverse column mix operation on four bytes in long word x in */
 /* parallel. NOTE: x must be a simple variable, NOT an expression in these macros.  */
 
-#if !(defined( REDUCE_CODE_SIZE ) && (defined( ASM_X86_V2 ) || defined( ASM_X86_V2C )))
+#if !(defined( REDUCE_CODE_SIZE ) && (defined( ASM_X86_V2 ) || defined( ASM_X86_V2C ))) 
 
 #if defined( FM4_SET )      /* not currently used */
 #  define fwd_mcol(x)       four_tables(x,t_use(f,m),vf1,rf1,0)

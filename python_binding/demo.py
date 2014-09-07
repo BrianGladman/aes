@@ -1,11 +1,12 @@
 import os, psutil
 from aes import AES
 
-# Pin the Python process to CPU 0 to measure performance
+# Pin the Python process to the last CPU to measure performance
 # Note: this code works for psutil 1.2.x, not 2.x!
 cpu_count = psutil.NUM_CPUS
 p = psutil.Process(os.getpid())
-p.set_cpu_affinity([0])
+proc_list = p.get_cpu_affinity()
+p.set_cpu_affinity([proc_list[-1]])
 
 # Perform several encryption / decryption operations
 

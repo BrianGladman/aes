@@ -173,16 +173,16 @@ Issue Date: 20/12/2007
 #  define INTEL_AES_POSSIBLE
 #endif
 
-/*  Define this option if support for the Intel AESNI is required (not
-    currently available with GCC). If USE_INTEL_AES_IF_PRESENT is defined 
-    then AESNI will be used if it is detected (both present and enabled).
+/*  Define this option if support for the Intel AESNI is required
+    If USE_INTEL_AES_IF_PRESENT is defined then AESNI will be used
+    if it is detected (both present and enabled).
 
 	AESNI uses a decryption key schedule with the first decryption
 	round key at the high end of the key scedule with the following
 	round keys at lower positions in memory.  So AES_REV_DKS must NOT
 	be defined when AESNI will be used.  ALthough it is unlikely that
 	assembler code will be used with an AESNI build, if it is then
-	AES_REV_DKS must NOT be defined when such assembler files are
+	AES_REV_DKS must NOT be defined when the assembler files are
 	built
 */
 

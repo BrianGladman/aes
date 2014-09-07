@@ -23,23 +23,13 @@ Issue Date: 20/12/2007
 
 #if defined( __GNUC__ )
 
-#   if defined( __i386__ ) && defined( __ILP32__ ) /* x86 32-bit */
-    __inline__ unsigned long long read_tsc(void)
+    static inline volatile unsigned long long read_tsc(void)
     {
-        unsigned long long tick;
-        __asm__ __volatile__("rdtsc":"=A"(tick));
-        return tick;
+        unsigned int cyl, cyh;
+        /* The cpuid instruction clobbers EBX, EDX and ECX */
+        __asm__ __volatile__("cpuid; rdtsc":"=a"(cyl),"=d"(cyh)::"ebx","ecx");
+        return ((unsigned long long)cyh << 32) | cyl;
     }
-#   elif defined( __x86_64__ ) && defined( __LP64__ ) /* x86 64-bit */
-    __inline__ unsigned long long read_tsc(void)
-    {
-        unsigned int tickl, tickh;
-        __asm__ __volatile__("rdtsc":"=a"(tickl),"=d"(tickh));
-        return ((unsigned long long)tickh << 32)|tickl;
-    }
-#   else
-#   error Please define read_tsc() for your platform in rdtsc.h
-#   endif
 
 #elif defined( _WIN32 ) || defined( _WIN64 )
 

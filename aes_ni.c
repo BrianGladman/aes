@@ -42,16 +42,13 @@ INLINE int has_aes_ni()
 
 #elif defined( __GNUC__ )
 
+#include <cpuid.h>
 #pragma GCC target ("ssse3")
 #pragma GCC target ("sse4.1")
 #pragma GCC target ("aes")
 #include <wmmintrin.h>
 #include <smmintrin.h>
 #define INLINE  static __inline
-
-#define cpuid(func, ax, bx, cx, dx)		\
-	__asm__ __volatile__("cpuid":		\
-	"=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
 
 INLINE int has_aes_ni()
 {
@@ -60,8 +57,10 @@ INLINE int has_aes_ni()
     {
         static int test = -1;
         unsigned int a, b, c, d;
-        cpuid(1, a, b, c, d);
-        test = (c & 0x2000000);
+        if(!__get_cpuid(1, &a, &b, &c, &d))
+            test = 0;
+        else
+            test = (c & 0x2000000);
     }
     return test;
 }

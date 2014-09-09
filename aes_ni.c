@@ -46,8 +46,7 @@ INLINE int has_aes_ni()
 #pragma GCC target ("ssse3")
 #pragma GCC target ("sse4.1")
 #pragma GCC target ("aes")
-#include <wmmintrin.h>
-#include <smmintrin.h>
+#include <x86intrin.h>
 #define INLINE  static __inline
 
 INLINE int has_aes_ni()
@@ -55,7 +54,6 @@ INLINE int has_aes_ni()
     static int test = -1;
     if(test < 0)
     {
-        static int test = -1;
         unsigned int a, b, c, d;
         if(!__get_cpuid(1, &a, &b, &c, &d))
             test = 0;

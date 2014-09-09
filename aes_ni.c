@@ -25,7 +25,6 @@ Issue Date: 09/09/2014
 
 #include <intrin.h>
 #pragma intrinsic(__cpuid)
-#define cpuid __cpuid
 #define INLINE  __inline
 
 INLINE int has_aes_ni()

@@ -14,7 +14,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 13/11/2013
+Issue Date: 09/09/2014
 */
 
 #include "aes_ni.h"

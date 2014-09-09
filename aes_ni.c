@@ -17,15 +17,19 @@ and fitness for purpose.
 Issue Date: 13/11/2013
 */
 
-#include <intrin.h>
 #include "aes_ni.h"
 
 #if defined( USE_INTEL_AES_IF_PRESENT )
 
 #if defined( _MSC_VER )
+#include <intrin.h>
 #  pragma intrinsic(__cpuid)
 #  define INLINE  __inline
 #elif defined( __GNUC__ )
+#  define __SSSE3__
+#  define __SSE4_1__
+#  define __AES__
+#  include <x86intrin.h>
 #  define INLINE  static __inline
 #else
 #  error AES New Instructions require Microsoft, Intel or GNU C

@@ -2,6 +2,11 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Changes (09/09/2014)
+
+1. Added the ability to use Intel's hardware support for AES
+   with GCC on Windows and Linux
+
 Changes (01/09/2014)
 ====================
 

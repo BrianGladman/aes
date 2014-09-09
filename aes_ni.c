@@ -21,12 +21,25 @@ Issue Date: 09/09/2014
 
 #if defined( USE_INTEL_AES_IF_PRESENT )
 
-#if defined(_MSC_VER)
-
+#if defined( _MSC_VER )
 #include <intrin.h>
-#pragma intrinsic(__cpuid)
-#define cpuid __cpuid
-#define INLINE  __inline
+#  pragma intrinsic(__cpuid)
+#  define INLINE  __inline
+#elif defined( __GNUC__ )
+#  if 0
+#    define __SSSE3__
+#    define __SSE4_1__
+#    define __AES_
+#  else
+#    pragma GCC target ("ssse3")
+#    pragma GCC target ("sse4.1")
+#    pragma GCC target ("aes")
+#  endif
+#  include <x86intrin.h>
+#  define INLINE  static __inline
+#else
+#  error AES New Instructions require Microsoft, Intel or GNU C
+#endif
 
 INLINE int has_aes_ni()
 {

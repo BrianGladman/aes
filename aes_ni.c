@@ -26,9 +26,15 @@ Issue Date: 13/11/2013
 #  pragma intrinsic(__cpuid)
 #  define INLINE  __inline
 #elif defined( __GNUC__ )
-#  define __SSSE3__
-#  define __SSE4_1__
-#  define __AES__
+#  if 0
+#    define __SSSE3__
+#    define __SSE4_1__
+#    define __AES_
+#  else
+#    pragma GCC target ("ssse3")
+#    pragma GCC target ("sse4.1")
+#    pragma GCC target ("aes")
+#  endif
 #  include <x86intrin.h>
 #  define INLINE  static __inline
 #else

@@ -14,32 +14,19 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 13/11/2013
+Issue Date: 09/09/2014
 */
 
 #include "aes_ni.h"
 
 #if defined( USE_INTEL_AES_IF_PRESENT )
 
-#if defined( _MSC_VER )
+#if defined(_MSC_VER)
+
 #include <intrin.h>
-#  pragma intrinsic(__cpuid)
-#  define INLINE  __inline
-#elif defined( __GNUC__ )
-#  if 0
-#    define __SSSE3__
-#    define __SSE4_1__
-#    define __AES_
-#  else
-#    pragma GCC target ("ssse3")
-#    pragma GCC target ("sse4.1")
-#    pragma GCC target ("aes")
-#  endif
-#  include <x86intrin.h>
-#  define INLINE  static __inline
-#else
-#  error AES New Instructions require Microsoft, Intel or GNU C
-#endif
+#pragma intrinsic(__cpuid)
+#define cpuid __cpuid
+#define INLINE  __inline
 
 INLINE int has_aes_ni()
 {
@@ -52,6 +39,35 @@ INLINE int has_aes_ni()
 	}
 	return test;
 }
+
+#elif defined( __GNUC__ )
+
+#include <cpuid.h>
+#pragma GCC target ("ssse3")
+#pragma GCC target ("sse4.1")
+#pragma GCC target ("aes")
+#include <wmmintrin.h>
+#include <smmintrin.h>
+#define INLINE  static __inline
+
+INLINE int has_aes_ni()
+{
+    static int test = -1;
+    if(test < 0)
+    {
+        static int test = -1;
+        unsigned int a, b, c, d;
+        if(!__get_cpuid(1, &a, &b, &c, &d))
+            test = 0;
+        else
+            test = (c & 0x2000000);
+    }
+    return test;
+}
+
+#else
+#error AES New Instructions require Microsoft, Intel or GNU C
+#endif
 
 INLINE __m128i aes_128_assist(__m128i t1, __m128i t2)
 {

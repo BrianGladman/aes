@@ -29,19 +29,10 @@ Issue Date: 30/08/2014
 #include <structmember.h>
 
 #ifndef _MSC_VER
-#  include <endian.h>
 #  include <sys/mman.h>
 #else
 #  include <Windows.h>
 #  include <malloc.h>
-#  include <intrin.h>
-#  pragma intrinsic( _byteswap_uint64 )
-#  define LITTLE_ENDIAN 1234
-#  define BIG_ENDIAN    4321
-/* Must hard-code these for Windows */
-#  define BYTE_ORDER    LITTLE_ENDIAN
-#  define be64toh(x)    _byteswap_uint64(x)
-#  define htobe64(x)    _byteswap_uint64(x)
 #  define strncasecmp _strnicmp
 #endif
 
@@ -90,23 +81,13 @@ This subroutine implements the CTR mode standard incrementing function.
 See NIST Special Publication 800-38A, Appendix B for details:
 http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
 */
+#define CTR_POS 8
+
 void ctr_inc(unsigned char *cbuf)
 {
-    uint64_t c;
-#if BYTE_ORDER == LITTLE_ENDIAN
-    c = be64toh(*(uint64_t *)(cbuf + 8));
-    c++;
-    *(uint64_t *)(cbuf + 8) = htobe64(c);
-#elif BYTE_ORDER == BIG_ENDIAN
-    /* big endian support? completely untested... */
-    c = be64toh(*(uint64_t *)(cbuf + 0));
-    c++;
-    *(uint64_t *)(cbuf + 0) = htobe64(c);
-#else
-    /* something more exotic? */
-    #error "Unsupported byte order"
-#endif
-    return;
+    unsigned char *p = cbuf + AES_BLOCK_SIZE, *e = cbuf + CTR_POS;
+    while(p-- > e && !++(*p))
+        ;
 }
 
 /*

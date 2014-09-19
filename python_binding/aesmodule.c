@@ -96,7 +96,7 @@ https://mail.python.org/pipermail/python-dev/2000-October/009974.html
 Suggested data type for {en|de}cryption: Python array class
 */
 
-static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
+static PyObject *py_aes_encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -177,7 +177,7 @@ static PyObject *encrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 #endif
 }
 
-static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
+static PyObject *py_aes_decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     aes_mode mode;
     PyObject *data;
@@ -257,7 +257,7 @@ static PyObject *decrypt(aes_AESObject *self, PyObject *args, PyObject *kwds)
 #endif
 }
 
-static PyObject *reset(aes_AESObject *self)
+static PyObject *py_aes_reset(aes_AESObject *self)
 {
     switch(self->mode) {
     case AES_MODE_ECB:
@@ -279,9 +279,9 @@ static PyObject *reset(aes_AESObject *self)
 
 static PyMethodDef aes_AESmethods[] =
 {
-    { "encrypt", (PyCFunction)encrypt, METH_VARARGS | METH_KEYWORDS, "encrypts a series of blocks" },
-    { "decrypt", (PyCFunction)decrypt, METH_VARARGS | METH_KEYWORDS, "decrypts a series of blocks" },
-    { "reset",   (PyCFunction)reset,   METH_NOARGS,                  "resets the object state"     },
+    { "encrypt", (PyCFunction)py_aes_encrypt, METH_VARARGS | METH_KEYWORDS, "encrypts a series of blocks" },
+    { "decrypt", (PyCFunction)py_aes_decrypt, METH_VARARGS | METH_KEYWORDS, "decrypts a series of blocks" },
+    { "reset",   (PyCFunction)py_aes_reset,   METH_NOARGS,                  "resets the object state"     },
     {NULL}  /* Sentinel */
 };
 
@@ -290,7 +290,7 @@ static PyMemberDef aes_members[] =
     {NULL}  /* Sentinel */
 };
 
-static int init(aes_AESObject *self, PyObject *args, PyObject *kwds)
+static int py_aes_init(aes_AESObject *self, PyObject *args, PyObject *kwds)
 {
     size_t mode_len = 0;
     const char *mode = NULL;
@@ -496,7 +496,7 @@ static PyTypeObject aes_AESType =
     0,                         /*tp_descr_get */
     0,                         /*tp_descr_set */
     0,                         /*tp_dictoffset */
-    (initproc)init,            /*tp_init */
+    (initproc)py_aes_init,     /*tp_init */
     (allocfunc)secure_alloc,   /*tp_alloc */
     (newfunc)PyType_GenericNew,/*tp_new */
     (freefunc)secure_free,     /*tp_free */

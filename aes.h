@@ -78,16 +78,24 @@ typedef union
 
 #ifdef _WIN64
 __declspec(align(16))
-#endif 
+#endif
+#if defined(__GNUC__) || defined(__clang__) 
+typedef struct __attribute__((aligned(16)))
+#else
 typedef struct
+#endif
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
 } aes_encrypt_ctx;
 
 #ifdef _WIN64
 __declspec(align(16))
-#endif 
+#endif
+#if defined(__GNUC__) || defined(__clang__) 
+typedef struct __attribute__((aligned(16)))
+#else
 typedef struct
+#endif
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
 } aes_decrypt_ctx;

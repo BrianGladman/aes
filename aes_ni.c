@@ -520,7 +520,11 @@ void AES_CTR_encrypt(const unsigned char *in,
 	else length /= 16;
 	ONE = _mm_set_epi32(0, 1, 0, 0);
 	BSWAP_EPI64 = _mm_setr_epi8(7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
-	ctr_block = _mm_set_epi64(*(__m64*)ivec, (__m64)ctr_block[0]);
+#ifndef _WIN64
+	ctr_block = _mm_insert_epi64(ctr_block, *(long long*)ivec, 1);
+#else
+	ctr_block = _mm_set_epi64(*(__m64*)ivec, *(__m64*)&ctr_block);
+#endif
 	ctr_block = _mm_insert_epi32(ctr_block, *(long*)nonce, 1);
 	ctr_block = _mm_srli_si128(ctr_block, 4);
 	ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);

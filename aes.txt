@@ -589,5 +589,5 @@ Please note the following IMPORTANT points about the AES mode subroutines:
        of mode (but encryption and decryption keys must 
        both be set if they are needed).  
        
-   Brian Gladman  14/11/2013
+   Brian Gladman  14/11/2014
  

@@ -87,8 +87,7 @@ AES_RETURN aes_ni(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
 
 	if(!has_aes_ni())
 	{
-		aes_xi(encrypt_key128)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(encrypt_key128)(key, cx);
 	}
 
 	t1 = _mm_loadu_si128((__m128i*)key);
@@ -164,8 +163,7 @@ AES_RETURN aes_ni(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
 
 	if(!has_aes_ni())
 	{
-		aes_xi(encrypt_key192)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(encrypt_key192)(key, cx);
 	}
 
 	t1 = _mm_loadu_si128((__m128i*)key);
@@ -253,8 +251,7 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 
 	if(!has_aes_ni())
 	{
-		aes_xi(encrypt_key256)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(encrypt_key256)(key, cx);
 	}
 
 	t1 = _mm_loadu_si128((__m128i*)key);
@@ -321,8 +318,7 @@ AES_RETURN aes_ni(decrypt_key128)(const unsigned char *key, aes_decrypt_ctx cx[1
 {
 	if(!has_aes_ni())
 	{
-		aes_xi(decrypt_key128)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(decrypt_key128)(key, cx);
 	}
 
 	if(aes_ni(encrypt_key128)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
@@ -339,8 +335,7 @@ AES_RETURN aes_ni(decrypt_key192)(const unsigned char *key, aes_decrypt_ctx cx[1
 {
 	if(!has_aes_ni())
 	{
-		aes_xi(decrypt_key192)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(decrypt_key192)(key, cx);
 	}
 
 	if(aes_ni(encrypt_key192)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
@@ -356,8 +351,7 @@ AES_RETURN aes_ni(decrypt_key256)(const unsigned char *key, aes_decrypt_ctx cx[1
 {
 	if(!has_aes_ni())
 	{
-		aes_xi(decrypt_key256)(key, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(decrypt_key256)(key, cx);
 	}
 
 	if(aes_ni(encrypt_key256)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
@@ -378,8 +372,7 @@ AES_RETURN aes_ni(encrypt)(const unsigned char *in, unsigned char *out, const ae
 
 	if(!has_aes_ni())
 	{
-		aes_xi(encrypt)(in, out, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(encrypt)(in, out, cx);
 	}
 
 	t = _mm_xor_si128(_mm_loadu_si128((__m128i*)in), *(__m128i*)key);
@@ -418,8 +411,7 @@ AES_RETURN aes_ni(decrypt)(const unsigned char *in, unsigned char *out, const ae
 
 	if(!has_aes_ni())
 	{
-		aes_xi(decrypt)(in, out, cx);
-		return EXIT_SUCCESS;
+		return aes_xi(decrypt)(in, out, cx);
 	}
 
 	t = _mm_xor_si128(_mm_loadu_si128((__m128i*)in), *(__m128i*)key);
@@ -449,17 +441,28 @@ AES_RETURN aes_ni(decrypt)(const unsigned char *in, unsigned char *out, const ae
 	return EXIT_SUCCESS;
 }
 
-void aes_CBC_encrypt(const unsigned char *in,
+#ifdef ADD_AESNI_MODE_CALLS
+#ifdef USE_AES_CONTEXT
+
+AES_RETURN aes_CBC_encrypt(const unsigned char *in,
 	unsigned char *out,
 	unsigned char ivec[16],
 	unsigned long length,
-	unsigned char *key,
-	int number_of_rounds)
+    const aes_encrypt_ctx cx[1])
 {
-	__m128i feedback, data;
-	unsigned long i;
-	int j;
-	if(length % 16)
+	__m128i feedback, data, *key = (__m128i*)cx->ks;
+	int number_of_rounds = cx->inf.b[0] >> 4, j;
+    unsigned long i;
+    
+    if(number_of_rounds != 10 && number_of_rounds != 12 && number_of_rounds != 14)
+        return EXIT_FAILURE;
+
+    if(!has_aes_ni())
+    {
+        return aes_cbc_encrypt(in, out, length, ivec, cx);
+    }
+
+    if(length % 16)
 		length = length / 16 + 1;
 	else length /= 16;
 	feedback = _mm_loadu_si128((__m128i*)ivec);
@@ -473,6 +476,137 @@ void aes_CBC_encrypt(const unsigned char *in,
 		feedback = _mm_aesenclast_si128(feedback, ((__m128i*)key)[j]);
 		_mm_storeu_si128(&((__m128i*)out)[i], feedback);
 	}
+    return EXIT_SUCCESS;
+}
+
+AES_RETURN aes_CBC_decrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    const aes_decrypt_ctx cx[1])
+{
+    __m128i data, feedback, last_in, *key = (__m128i*)cx->ks;
+    int number_of_rounds = cx->inf.b[0] >> 4, j;
+    unsigned long i;
+
+    if(number_of_rounds != 10 && number_of_rounds != 12 && number_of_rounds != 14)
+        return EXIT_FAILURE;
+
+    if(!has_aes_ni())
+    {
+        return aes_cbc_decrypt(in, out, length, ivec, cx);
+    }
+
+    if(length % 16)
+        length = length / 16 + 1;
+    else length /= 16;
+    feedback = _mm_loadu_si128((__m128i*)ivec);
+    for(i = 0; i < length; i++)
+    {
+        last_in = _mm_loadu_si128(&((__m128i*)in)[i]);
+        data = _mm_xor_si128(last_in, ((__m128i*)key)[number_of_rounds]);
+        for(j = number_of_rounds - 1; j > 0; j--)
+        {
+            data = _mm_aesdec_si128(data, ((__m128i*)key)[j]);
+        }
+        data = _mm_aesdeclast_si128(data, ((__m128i*)key)[0]);
+        data = _mm_xor_si128(data, feedback);
+        _mm_storeu_si128(&((__m128i*)out)[i], data);
+        feedback = last_in;
+    }
+    return EXIT_SUCCESS;
+}
+
+static void ctr_inc(unsigned char *ctr_blk)
+{
+    uint32_t c;
+
+    c = *(uint32_t*)(ctr_blk + 8);
+    c++;
+    *(uint32_t*)(ctr_blk + 8) = c;
+
+    if(!c)
+        *(uint32_t*)(ctr_blk + 12) = *(uint32_t*)(ctr_blk + 12) + 1;
+}
+
+AES_RETURN AES_CTR_encrypt(const unsigned char *in,
+    unsigned char *out,
+    const unsigned char ivec[8],
+    const unsigned char nonce[4],
+    unsigned long length,
+    const aes_encrypt_ctx cx[1])
+{
+    __m128i ctr_block = { 0 }, *key = (__m128i*)cx->ks, tmp, ONE, BSWAP_EPI64;
+    int number_of_rounds = cx->inf.b[0] >> 4, j;
+    unsigned long i;
+
+    if(number_of_rounds != 10 && number_of_rounds != 12 && number_of_rounds != 14)
+        return EXIT_FAILURE;
+
+    if(!has_aes_ni())
+    {
+        unsigned char ctr_blk[16];
+        *(uint64_t*)ctr_blk = *(uint64_t*)ivec;
+        *(uint32_t*)(ctr_blk + 8) = *(uint32_t*)nonce;
+        return aes_ctr_crypt(in, out, length, (unsigned char*)ctr_blk, ctr_inc, cx);
+    }
+
+    if(length % 16)
+        length = length / 16 + 1;
+    else length /= 16;
+    ONE = _mm_set_epi32(0, 1, 0, 0);
+    BSWAP_EPI64 = _mm_setr_epi8(7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
+#ifdef _WIN64
+    ctr_block = _mm_insert_epi64(ctr_block, *(long long*)ivec, 1);
+#else
+    ctr_block = _mm_set_epi64(*(__m64*)ivec, *(__m64*)&ctr_block);
+#endif
+    ctr_block = _mm_insert_epi32(ctr_block, *(long*)nonce, 1);
+    ctr_block = _mm_srli_si128(ctr_block, 4);
+    ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
+    ctr_block = _mm_add_epi64(ctr_block, ONE);
+    for(i = 0; i < length; i++)
+    {
+        tmp = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
+        ctr_block = _mm_add_epi64(ctr_block, ONE);
+        tmp = _mm_xor_si128(tmp, ((__m128i*)key)[0]);
+        for(j = 1; j <number_of_rounds; j++)
+        {
+            tmp = _mm_aesenc_si128(tmp, ((__m128i*)key)[j]);
+        };
+        tmp = _mm_aesenclast_si128(tmp, ((__m128i*)key)[j]);
+        tmp = _mm_xor_si128(tmp, _mm_loadu_si128(&((__m128i*)in)[i]));
+        _mm_storeu_si128(&((__m128i*)out)[i], tmp);
+    }
+    return EXIT_SUCCESS;
+}
+
+#else
+
+void aes_CBC_encrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    unsigned char *key,
+    int number_of_rounds)
+{
+    __m128i feedback, data;
+    unsigned long i;
+    int j;
+    if(length % 16)
+        length = length / 16 + 1;
+    else length /= 16;
+    feedback = _mm_loadu_si128((__m128i*)ivec);
+    for(i = 0; i < length; i++)
+    {
+        data = _mm_loadu_si128(&((__m128i*)in)[i]);
+        feedback = _mm_xor_si128(data, feedback);
+        feedback = _mm_xor_si128(feedback, ((__m128i*)key)[0]);
+        for(j = 1; j <number_of_rounds; j++)
+            feedback = _mm_aesenc_si128(feedback, ((__m128i*)key)[j]);
+        feedback = _mm_aesenclast_si128(feedback, ((__m128i*)key)[j]);
+        _mm_storeu_si128(&((__m128i*)out)[i], feedback);
+    }
 }
 
 void aes_CBC_decrypt(const unsigned char *in,
@@ -543,5 +677,7 @@ void AES_CTR_encrypt(const unsigned char *in,
 		_mm_storeu_si128(&((__m128i*)out)[i], tmp);
 	}
 }
+#endif
+#endif
 
 #endif

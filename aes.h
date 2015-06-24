@@ -212,6 +212,60 @@ AES_RETURN aes_ctr_crypt(const unsigned char *ibuf, unsigned char *obuf,
 
 #endif
 
+#if 1
+#define ADD_AESNI_MODE_CALLS
+#define USE_AES_CONTEXT
+#endif
+
+#ifdef ADD_AESNI_MODE_CALLS
+#  ifdef USE_AES_CONTEXT
+
+AES_RETURN aes_CBC_encrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    const aes_encrypt_ctx cx[1]);
+
+AES_RETURN aes_CBC_decrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    const aes_decrypt_ctx cx[1]);
+
+AES_RETURN AES_CTR_encrypt(const unsigned char *in,
+    unsigned char *out,
+    const unsigned char ivec[8],
+    const unsigned char nonce[4],
+    unsigned long length,
+    const aes_encrypt_ctx cx[1]);
+
+#  else
+
+void aes_CBC_encrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    unsigned char *key,
+    int number_of_rounds);
+
+void aes_CBC_decrypt(const unsigned char *in,
+    unsigned char *out,
+    unsigned char ivec[16],
+    unsigned long length,
+    unsigned char *key,
+    int number_of_rounds);
+
+void AES_CTR_encrypt(const unsigned char *in,
+    unsigned char *out,
+    const unsigned char ivec[8],
+    const unsigned char nonce[4],
+    unsigned long length,
+    const unsigned char *key,
+    int number_of_rounds);
+
+#  endif
+#endif
+
 #if defined(__cplusplus)
 }
 #endif

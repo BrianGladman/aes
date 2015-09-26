@@ -20,6 +20,9 @@
     <ClCompile Include="..\aes_modes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\aes_auto_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <YASM Include="..\aes_x86_v1.asm">

@@ -92,6 +92,7 @@ aes_ni.c        the AES_NI implementation
 
 Other associated files for testing and support are:
 
+aes_auto_init.c automatic table runtime generation support for MSVC, GCC and clang
 aesaux.h        header for auxilliary routines for testsing
 aesaux.c        auxilliary routines for testsingt
 aestst.h        header file for setting the testing environment

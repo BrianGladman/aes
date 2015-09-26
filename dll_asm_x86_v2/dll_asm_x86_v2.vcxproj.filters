@@ -11,10 +11,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\aes_dll_main.c">
+    <ClCompile Include="..\aes_modes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\aes_modes.c">
+    <ClCompile Include="..\aes_auto_init.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

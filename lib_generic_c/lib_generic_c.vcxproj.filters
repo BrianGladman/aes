@@ -26,6 +26,9 @@
     <ClCompile Include="..\aes_ni.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\aes_auto_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\aes.h">

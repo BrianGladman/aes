@@ -1272,7 +1272,7 @@ int main(void)
 #if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
     if(!(h_dll = init_dll(&fn)))
         return -1;
-#elif defined(STATIC_TABLES)
+#elif !defined(STATIC_TABLES)
     aes_init();
 #endif
 

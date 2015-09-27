@@ -315,7 +315,7 @@ Issue Date: 20/12/2007
 /*  6. FAST FINITE FIELD OPERATIONS
 
     If this section is included, tables are used to provide faster finite
-    field arithmetic (this has no effect if FIXED_TABLES is defined).
+    field arithmetic (this has no effect if STATIC_TABLES is defined).
 */
 #if 1
 #  define FF_TABLES
@@ -339,7 +339,7 @@ Issue Date: 20/12/2007
     must be called to compute them before the code is first used.
 */
 #if 1 && !(defined( _MSC_VER ) && ( _MSC_VER <= 800 ))
-#  define FIXED_TABLES
+#  define STATIC_TABLES
 #endif
 
 /*  9. MASKING OR CASTING FROM LONGER VALUES TO BYTES

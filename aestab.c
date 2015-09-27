@@ -23,7 +23,7 @@ Issue Date: 20/12/2007
 #include "aes.h"
 #include "aesopt.h"
 
-#if defined(FIXED_TABLES)
+#if defined(STATIC_TABLES)
 
 #define sb_data(w) {\
     w(0x63), w(0x7c), w(0x77), w(0x7b), w(0xf2), w(0x6b), w(0x6f), w(0xc5),\
@@ -150,7 +150,7 @@ Issue Date: 20/12/2007
 
 #endif
 
-#if defined(FIXED_TABLES) || !defined(FF_TABLES)
+#if defined(STATIC_TABLES) || !defined(FF_TABLES)
 
 #define f2(x)   ((x<<1) ^ (((x>>7) & 1) * WPOLY))
 #define f4(x)   ((x<<2) ^ (((x>>6) & 1) * WPOLY) ^ (((x>>6) & 2) * WPOLY))
@@ -180,7 +180,7 @@ extern "C"
 {
 #endif
 
-#if defined(FIXED_TABLES)
+#if defined(STATIC_TABLES)
 
 /* implemented in case of wrong call for fixed tables */
 
@@ -382,6 +382,27 @@ AES_RETURN aes_init(void)
     init = 1;
     return EXIT_SUCCESS;
 }
+
+/* automatic code initialisation (suggested by by Henrik S. Gaﬂmann) */
+
+#ifdef _MSC_VER
+
+#pragma section(".CRT$XCU", read)
+
+__declspec(allocate(".CRT$XCU")) void (__cdecl *aes_startup)(void) = aes_init;
+
+#elif defined(__GNUC__)
+
+static void aes_startup(void) __attribute__((constructor))
+{
+    aes_init();
+}
+
+#else
+
+#error dynamic tables cannot be initialised on your system
+
+#endif
 
 #endif
 

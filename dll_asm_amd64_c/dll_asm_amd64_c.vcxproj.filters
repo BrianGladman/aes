@@ -22,9 +22,6 @@
     <ClCompile Include="..\aestab.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\aes_dll_main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\aes_modes.c">
       <Filter>Source Files</Filter>
     </ClCompile>

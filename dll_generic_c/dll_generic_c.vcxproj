@@ -210,7 +210,6 @@ copy "$(TargetDir)$(TargetName).pdb" "$(TargetDir)aes.pdb"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\aes_dll_main.c" />
     <ClCompile Include="..\aes_modes.c" />
     <ClCompile Include="..\aescrypt.c" />
     <ClCompile Include="..\aeskey.c" />

@@ -130,7 +130,6 @@ copy "$(TargetDir)$(TargetName).pdb" "$(TargetDir)aes.pdb"
     <YASM Include="..\aes_amd64.asm" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\aes_dll_main.c" />
     <ClCompile Include="..\aes_modes.c" />
     <ClCompile Include="..\aeskey.c" />
     <ClCompile Include="..\aestab.c" />

@@ -2,6 +2,11 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Changes (27/09/2015)
+
+1. Added automatic dynamic table initialisation (my thanks to
+   Henrik S. Gaﬂmann who proposed this addition).
+
 Changes (09/09/2014)
 ====================
 

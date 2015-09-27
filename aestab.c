@@ -383,7 +383,27 @@ AES_RETURN aes_init(void)
     return EXIT_SUCCESS;
 }
 
+/* automatic code initialisation (suggested by by Henrik S. Gaﬂmann) */
+
+#ifdef _MSC_VER
+
+#pragma section(".CRT$XCU", read)
+
+__declspec(allocate(".CRT$XCU")) void (__cdecl *aes_startup)(void) = aes_init;
+
+#elif defined(__GNUC__)
+
+static void aes_startup(void) __attribute__((constructor))
+{
+    aes_init();
+}
+
+#else
+
 #error dynamic tables must be initialised manually on your system
+
+#endif
+
 #endif
 
 #if defined(__cplusplus)

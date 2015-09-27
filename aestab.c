@@ -383,7 +383,11 @@ AES_RETURN aes_init(void)
     return EXIT_SUCCESS;
 }
 
-/* automatic code initialisation (suggested by by Henrik S. Gaﬂmann) */
+/* 
+   Automatic code initialisation (suggested by by Henrik S. Ga√ümann)
+   based on code provided by Joe Lowe and placed in the public domain at:
+   http://stackoverflow.com/questions/1113409/attribute-constructor-equivalent-in-vc
+*/
 
 #ifdef _MSC_VER
 

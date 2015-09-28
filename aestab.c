@@ -406,7 +406,7 @@ static void aes_startup(void)
 
 #else
 
-#error dynamic tables must be initialised manually on your system
+#pragma message( "dynamic tables must be initialised manually on your system" )
 
 #endif
 

@@ -76,26 +76,20 @@ typedef union
 #  pragma warning( disable : 4324 )
 #endif
 
-#ifdef _WIN64
-__declspec(align(16))
-#endif
-#if defined(__GNUC__) || defined(__clang__) 
-typedef struct __attribute__((aligned(16)))
+#if defined(_MSC_VER) && defined(_WIN64)
+#define ALIGNED_(x) __declspec(align(x))
+#elif defined(__GNUC__) && defined(__x86_64__)
+#define ALIGNED_(x) __attribute__ ((aligned(x)))
 #else
-typedef struct
+#define ALIGNED_(x)
 #endif
+
+typedef struct ALIGNED_(16)
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
 } aes_encrypt_ctx;
 
-#ifdef _WIN64
-__declspec(align(16))
-#endif
-#if defined(__GNUC__) || defined(__clang__) 
-typedef struct __attribute__((aligned(16)))
-#else
-typedef struct
-#endif
+typedef struct ALIGNED_(16)
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
 } aes_decrypt_ctx;

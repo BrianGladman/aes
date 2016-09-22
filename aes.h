@@ -159,9 +159,9 @@ AES_RETURN aes_decrypt(const unsigned char *in, unsigned char *out, const aes_de
 /* each individual call within a series of incremental calls must   */
 /* process only full blocks (i.e. len must be a multiple of 16) but */
 /* the CFB, OFB and CTR mode calls can handle multiple incremental  */
-/* calls of any length. Each mode is reset when a new AES key is    */
-/* set but ECB and CBC operations can be reset without setting a    */
-/* new key by setting a new IV value.  To reset CFB, OFB and CTR    */
+/* calls of any length.  Each mode is reset when a new AES key is   */
+/* set but ECB needs no reset and CBC can be reset without setting  */
+/* a new key by setting a new IV value.  To reset CFB, OFB and CTR  */
 /* without setting the key, aes_mode_reset() must be called and the */
 /* IV must be set.  NOTE: All these calls update the IV on exit so  */
 /* this has to be reset if a new operation with the same IV as the  */

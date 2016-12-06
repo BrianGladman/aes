@@ -2,7 +2,17 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Changes 6/12/2016)
+====================
+
+1. Changed function definition of has_aes_ni() to has_aes_ni(void), 
+   suggested by Peter Gutmann
+   
+2. Changed the default location for the vsyasm assembler to:
+   C:\Program Files\yasm
+
 Changes (27/09/2015)
+====================
 
 1. Added automatic dynamic table initialisation (my thanks to
    Henrik S. Gaﬂmann who proposed this addition).
@@ -149,19 +159,11 @@ B. YASM
 If you wish to use the x86 assembler files you will also need the YASM open
 source x86 assembler (r1331 or later) for Windows which can be obtained from:
 
-  http://www.tortall.net/projects/yasm/
+    http://www.tortall.net/projects/yasm/
 
-This assembler should be placed in the bin directory used by VC++, which, for
-Visual Stduio 2005, is typically:
+This assembler (vsyasm.exe) should be placed in the directory:
 
- C:\Program Files (x86)\Microsoft Visual Studio 8\VC\bin
-
-You will also need to move the yasm.rules file from this distribution into
-the directory where Visual Studio 2005 expects to find it, which is typically:
-
- C:\Program Files (x86)\Microsoft Visual Studio 8\VC\VCProjectDefaults
-
-Alternatively you can configure the path for rules files within Visual Studio.
+    C:\Program Files\yasm
 
 C. Configuration
 ----------------

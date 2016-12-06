@@ -27,7 +27,7 @@ Issue Date: 09/09/2014
 #pragma intrinsic(__cpuid)
 #define INLINE  __inline
 
-INLINE int has_aes_ni()
+INLINE int has_aes_ni(void)
 {
 	static int test = -1;
 	if(test < 0)

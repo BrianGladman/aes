@@ -159,8 +159,8 @@ int encfile(FILE *fin, FILE *fout, aes_encrypt_ctx ctx[1])
 {   unsigned char dbuf[3 * BLOCK_LEN];
     unsigned long i, len, wlen = BLOCK_LEN;
 
-    // When ciphertext stealing is used, we three ciphertext blocks so
-    // we use a buffer that is three times the block length.  The buffer
+    // When ciphertext stealing is used, we need three ciphertext blocks
+    // so we use a buffer that is three times the block length.  The buffer
     // pointers b1, b2 and b3 point to the buffer positions of three
     // ciphertext blocks, b3 being the most recent and b1 being the
     // oldest. We start with the IV in b1 and the block to be decrypted
@@ -247,8 +247,8 @@ int decfile(FILE *fin, FILE *fout, aes_decrypt_ctx ctx[1])
 {   unsigned char dbuf[3 * BLOCK_LEN], buf[BLOCK_LEN];
     unsigned long i, len, wlen = BLOCK_LEN;
 
-    // When ciphertext stealing is used, we three ciphertext blocks so
-    // we use a buffer that is three times the block length.  The buffer
+    // When ciphertext stealing is used, we need three ciphertext blocks
+    // so we use a buffer that is three times the block length.  The buffer
     // pointers b1, b2 and b3 point to the buffer positions of three
     // ciphertext blocks, b3 being the most recent and b1 being the
     // oldest. We start with the IV in b1 and the block to be decrypted

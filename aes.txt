@@ -569,7 +569,7 @@ Please note the following IMPORTANT points about the AES mode subroutines:
        below).
        
     3. For modes with IVs, the IV value is an input AND
-       an ouTput since it is updated after each call to 
+       an output since it is updated after each call to 
        the value needed for any subsequent incremental
        call(s). If the mode is reset, the IV hence has
        to be set (or reset) as well.

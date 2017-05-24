@@ -22,6 +22,7 @@
     <ProjectGuid>{6EC3A1E5-2B96-4402-A26B-0DF62A6D5631}</ProjectGuid>
     <RootNamespace>test_avs</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

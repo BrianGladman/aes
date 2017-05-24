@@ -22,6 +22,7 @@
     <ProjectGuid>{CD96CBBA-B3B6-4B94-A7C5-849021260C26}</ProjectGuid>
     <RootNamespace>time_dll</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

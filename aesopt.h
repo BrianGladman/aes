@@ -64,7 +64,7 @@ Issue Date: 20/12/2007
 
      Class AESencrypt  for encryption
 
-      Construtors:
+      Constructors:
           AESencrypt(void)
           AESencrypt(const unsigned char *key) - 128 bit key
       Members:
@@ -74,7 +74,7 @@ Issue Date: 20/12/2007
           AES_RETURN encrypt(const unsigned char *in, unsigned char *out) const
 
       Class AESdecrypt  for encryption
-      Construtors:
+      Constructors:
           AESdecrypt(void)
           AESdecrypt(const unsigned char *key) - 128 bit key
       Members:
@@ -182,7 +182,7 @@ Issue Date: 20/12/2007
 	AESNI uses a decryption key schedule with the first decryption
 	round key at the high end of the key scedule with the following
 	round keys at lower positions in memory.  So AES_REV_DKS must NOT
-	be defined when AESNI will be used.  ALthough it is unlikely that
+	be defined when AESNI will be used.  Although it is unlikely that
 	assembler code will be used with an AESNI build, if it is then
 	AES_REV_DKS must NOT be defined when the assembler files are
 	built

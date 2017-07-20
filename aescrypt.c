@@ -101,7 +101,7 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
     dec_fmvars; /* declare variables for fwd_mcol() if needed */
 #endif
 
-	if(cx->inf.b[0] != 10 * 16 && cx->inf.b[0] != 12 * 16 && cx->inf.b[0] != 14 * 16)
+	if(cx->inf.b[0] != 10 * AES_BLOCK_SIZE && cx->inf.b[0] != 12 * AES_BLOCK_SIZE && cx->inf.b[0] != 14 * AES_BLOCK_SIZE)
 		return EXIT_FAILURE;
 
 	kp = cx->ks;
@@ -111,15 +111,15 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
 
     switch(cx->inf.b[0])
     {
-    case 14 * 16:
+    case 14 * AES_BLOCK_SIZE:
         round(fwd_rnd,  b1, b0, kp + 1 * N_COLS);
         round(fwd_rnd,  b0, b1, kp + 2 * N_COLS);
         kp += 2 * N_COLS;
-    case 12 * 16:
+    case 12 * AES_BLOCK_SIZE:
         round(fwd_rnd,  b1, b0, kp + 1 * N_COLS);
         round(fwd_rnd,  b0, b1, kp + 2 * N_COLS);
         kp += 2 * N_COLS;
-    case 10 * 16:
+    case 10 * AES_BLOCK_SIZE:
         round(fwd_rnd,  b1, b0, kp + 1 * N_COLS);
         round(fwd_rnd,  b0, b1, kp + 2 * N_COLS);
         round(fwd_rnd,  b1, b0, kp + 3 * N_COLS);
@@ -233,7 +233,7 @@ AES_RETURN aes_xi(decrypt)(const unsigned char *in, unsigned char *out, const ae
 #endif
     const uint32_t *kp;
 
-	if(cx->inf.b[0] != 10 * 16 && cx->inf.b[0] != 12 * 16 && cx->inf.b[0] != 14 * 16)
+	if(cx->inf.b[0] != 10 * AES_BLOCK_SIZE && cx->inf.b[0] != 12 * AES_BLOCK_SIZE && cx->inf.b[0] != 14 * AES_BLOCK_SIZE)
 		return EXIT_FAILURE;
 
     kp = cx->ks + (key_ofs ? (cx->inf.b[0] >> 2) : 0);
@@ -244,13 +244,13 @@ AES_RETURN aes_xi(decrypt)(const unsigned char *in, unsigned char *out, const ae
     kp = cx->ks + (key_ofs ? 0 : (cx->inf.b[0] >> 2));
     switch(cx->inf.b[0])
     {
-    case 14 * 16:
+    case 14 * AES_BLOCK_SIZE:
         round(inv_rnd,  b1, b0, rnd_key(-13));
         round(inv_rnd,  b0, b1, rnd_key(-12));
-    case 12 * 16:
+    case 12 * AES_BLOCK_SIZE:
         round(inv_rnd,  b1, b0, rnd_key(-11));
         round(inv_rnd,  b0, b1, rnd_key(-10));
-    case 10 * 16:
+    case 10 * AES_BLOCK_SIZE:
         round(inv_rnd,  b1, b0, rnd_key(-9));
         round(inv_rnd,  b0, b1, rnd_key(-8));
         round(inv_rnd,  b1, b0, rnd_key(-7));

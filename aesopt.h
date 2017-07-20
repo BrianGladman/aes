@@ -182,10 +182,11 @@ Issue Date: 20/12/2007
 	AESNI uses a decryption key schedule with the first decryption
 	round key at the high end of the key scedule with the following
 	round keys at lower positions in memory.  So AES_REV_DKS must NOT
-	be defined when AESNI will be used.  ALthough it is unlikely that
+	be defined when AESNI will be used.  Although it is unlikely that
 	assembler code will be used with an AESNI build, if it is then
 	AES_REV_DKS must NOT be defined when the assembler files are
-	built
+	built (the definition of USE_INTEL_AES_IF_PRESENT in the assembler
+	code files must match that here if they are used). 
 */
 
 #if 1 && defined( INTEL_AES_POSSIBLE ) && !defined( USE_INTEL_AES_IF_PRESENT )

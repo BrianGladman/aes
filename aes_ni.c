@@ -135,7 +135,7 @@ AES_RETURN aes_ni(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
 	ks[10] = t1;
 
 	cx->inf.l = 0;
-	cx->inf.b[0] = 10 * 16;
+	cx->inf.b[0] = 10 * AES_BLOCK_SIZE;
 	return EXIT_SUCCESS;
 }
 
@@ -213,7 +213,7 @@ AES_RETURN aes_ni(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
 	ks[12] = t1;
 
 	cx->inf.l = 0;
-	cx->inf.b[0] = 12 * 16;
+	cx->inf.b[0] = 12 * AES_BLOCK_SIZE;
 	return EXIT_SUCCESS;
 }
 
@@ -301,7 +301,7 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 	ks[14] = t1;
 
 	cx->inf.l = 0;
-	cx->inf.b[0] = 14 * 16;
+	cx->inf.b[0] = 14 * AES_BLOCK_SIZE;
 	return EXIT_SUCCESS;
 }
 
@@ -367,7 +367,7 @@ AES_RETURN aes_ni(encrypt)(const unsigned char *in, unsigned char *out, const ae
 {
 	__m128i *key = (__m128i*)cx->ks, t;
 
-	if(cx->inf.b[0] != 10 * 16 && cx->inf.b[0] != 12 * 16 && cx->inf.b[0] != 14 * 16)
+	if(cx->inf.b[0] != 10 * AES_BLOCK_SIZE && cx->inf.b[0] != 12 * AES_BLOCK_SIZE && cx->inf.b[0] != 14 * AES_BLOCK_SIZE)
 		return EXIT_FAILURE;
 
 	if(!has_aes_ni())
@@ -379,13 +379,13 @@ AES_RETURN aes_ni(encrypt)(const unsigned char *in, unsigned char *out, const ae
 
 	switch(cx->inf.b[0])
 	{
-	case 14 * 16:
+	case 14 * AES_BLOCK_SIZE:
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
-	case 12 * 16:
+	case 12 * AES_BLOCK_SIZE:
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
-	case 10 * 16:
+	case 10 * AES_BLOCK_SIZE:
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
 		t = _mm_aesenc_si128(t, *(__m128i*)++key);
@@ -406,7 +406,7 @@ AES_RETURN aes_ni(decrypt)(const unsigned char *in, unsigned char *out, const ae
 {
 	__m128i *key = (__m128i*)cx->ks + (cx->inf.b[0] >> 4), t;
 
-	if(cx->inf.b[0] != 10 * 16 && cx->inf.b[0] != 12 * 16 && cx->inf.b[0] != 14 * 16)
+	if(cx->inf.b[0] != 10 * AES_BLOCK_SIZE && cx->inf.b[0] != 12 * AES_BLOCK_SIZE && cx->inf.b[0] != 14 * AES_BLOCK_SIZE)
 		return EXIT_FAILURE;
 
 	if(!has_aes_ni())
@@ -418,13 +418,13 @@ AES_RETURN aes_ni(decrypt)(const unsigned char *in, unsigned char *out, const ae
 
 	switch(cx->inf.b[0])
 	{
-	case 14 * 16:
+	case 14 * AES_BLOCK_SIZE:
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
-	case 12 * 16:
+	case 12 * AES_BLOCK_SIZE:
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
-	case 10 * 16:
+	case 10 * AES_BLOCK_SIZE:
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);
 		t = _mm_aesdec_si128(t, *(__m128i*)--key);

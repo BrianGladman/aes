@@ -64,7 +64,7 @@ Issue Date: 20/12/2007
 
      Class AESencrypt  for encryption
 
-      Construtors:
+      Constructors:
           AESencrypt(void)
           AESencrypt(const unsigned char *key) - 128 bit key
       Members:
@@ -74,7 +74,7 @@ Issue Date: 20/12/2007
           AES_RETURN encrypt(const unsigned char *in, unsigned char *out) const
 
       Class AESdecrypt  for encryption
-      Construtors:
+      Constructors:
           AESdecrypt(void)
           AESdecrypt(const unsigned char *key) - 128 bit key
       Members:

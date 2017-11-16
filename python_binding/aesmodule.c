@@ -512,6 +512,18 @@ static PyMethodDef aes_methods[] =
 #define PyMODINIT_FUNC void
 #endif
 
+#ifdef EXPORT_INITFUNC
+/* we must redefine PyMODINIT_FUNC to avoid
+ * exporting the init function. */
+#undef PyMODINIT_FUNC
+#if PY_MAJOR_VERSION >= 3
+/* in python 3.x module init returns PyObject *. */
+#define PyMODINIT_FUNC PyObject *
+#else
+#define PyMODINIT_FUNC void
+#endif
+#endif
+
 #if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef =
 {

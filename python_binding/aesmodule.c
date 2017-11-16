@@ -508,7 +508,17 @@ static PyMethodDef aes_methods[] =
     {NULL}  /* Sentinel */
 };
 
-#ifndef PyMODINIT_FUNC	/* declarations for DLL import/export */
+/* declarations for DLL import/export (if used in an embedded */ 
+/* Python interpreter it is necessary to suppress the export  */
+/* of the module initialisation function)                     */
+#if defined( SUPPRESS_INITFUNC_EXPORT )
+#  undef PyMODINIT_FUNC
+#  if PY_MAJOR_VERSION >= 3
+#    define PyMODINIT_FUNC PyObject *
+#  else
+#    define PyMODINIT_FUNC void
+#  endif
+#elif !defined( PyMODINIT_FUNC )
 #define PyMODINIT_FUNC void
 #endif
 

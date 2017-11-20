@@ -399,7 +399,6 @@ static int py_aes_init(aes_AESObject *self, PyObject *args, PyObject *kwds)
 /* https://docs.python.org/2/c-api/typeobj.html#PyTypeObject.tp_alloc */
 static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
-    int success;
     aes_AESObject *self;
     size_t required_mem, extra, tmp;
 
@@ -422,11 +421,9 @@ static PyObject *secure_alloc(PyTypeObject *type, Py_ssize_t nitems)
         return (PyObject *)PyErr_NoMemory();
     }
 #else
-    success = posix_memalign((void **)&self, 16, required_mem);
-    if (success != 0)
+    if(posix_memalign((void **)&self, 16, required_mem) != 0)
         return (PyObject *)PyErr_NoMemory();
-    success = mlock(self, required_mem);
-    if(success != 0)
+    if(mlock(self, required_mem) != 0)
     {
         free(self);
         return (PyObject *)PyErr_NoMemory();

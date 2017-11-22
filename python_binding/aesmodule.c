@@ -353,9 +353,9 @@ static int py_aes_init(aes_AESObject *self, PyObject *args, PyObject *kwds)
             PyErr_SetString(PyExc_ValueError, "IV/CTR buffer must be 16 bytes long");
             return -1;
         }
-        memcpy(self->iv, iv, AES_BLOCK_SIZE);
+        memcpy(self->iv, iv_buf.buf, AES_BLOCK_SIZE);
         /* Save a copy of the original IV, for possible reset later */
-        memcpy(self->iv_o, iv, AES_BLOCK_SIZE);
+        memcpy(self->iv_o, iv_buf.buf, AES_BLOCK_SIZE);
         PyBuffer_Release(&iv_buf);
     }
 

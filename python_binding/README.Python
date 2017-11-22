@@ -9,3 +9,7 @@ Or, for development work:
     $ python setup.py build_ext --inplace
 
 Usage is fairly straightforward; see demo.py for an example.
+
+The included test suite is not intended to be a complete implementation of
+the NIST test vectors.  Rather, it is used to verify the correctness of the
+Python wrappers around the AES function calls.

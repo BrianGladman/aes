@@ -14,9 +14,9 @@ def _test_ecb(test_vals, test_key):
         ct_bytes = bytearray([int(v, 16) for v in re.findall(r'..?', ct_str)])
         aes_ecb = AES(mode='ecb', key=test_key)
         aes_ecb.encrypt(pt_bytes)
-        assert pt_bytes == ct_bytes
+        assert pt_bytes == ct_bytes, "AES ECB mode encryption failure"
         aes_ecb.decrypt(pt_bytes)
-        assert pt_bytes == pt_copy
+        assert pt_bytes == pt_copy, "AES ECB mode decryption failure"
 
 
 def test_ecb_128():
@@ -93,10 +93,10 @@ def test_cbc_128_f21():
     ct_bytes = bytearray([int(v, 16) for v in re.findall(r'..?', ct_str)])
     aes_cbc = AES(mode='cbc', key=key_bytes, iv=iv_bytes)
     aes_cbc.encrypt(pt_bytes)
-    assert pt_bytes == ct_bytes
+    assert pt_bytes == ct_bytes, "AES CBC mode encryption failure"
     aes_cbc.reset()
     aes_cbc.decrypt(pt_bytes)
-    assert pt_bytes == pt_copy
+    assert pt_bytes == pt_copy, "AES CBC mode decryption failure"
 
 
 def test_cbc_128_f22():
@@ -124,10 +124,10 @@ def test_cbc_128_f22():
     ct_copy = copy.copy(ct_bytes)
     aes_cbc = AES(mode='cbc', key=key_bytes, iv=iv_bytes)
     aes_cbc.decrypt(ct_bytes)
-    assert pt_bytes == ct_bytes
+    assert pt_bytes == ct_bytes, "AES CBC mode encryption failure"
     aes_cbc.reset()
     aes_cbc.encrypt(ct_bytes)
-    assert ct_bytes == ct_copy
+    assert ct_bytes == ct_copy, "AES CBC mode decryption failure"
 
 
 def test_cfb128_aes192_f315():
@@ -155,10 +155,10 @@ def test_cfb128_aes192_f315():
     ct_bytes = bytearray([int(v, 16) for v in re.findall(r'..?', ct_str)])
     aes_cfb = AES(mode='cfb', key=key_bytes, iv=iv_bytes)
     aes_cfb.encrypt(pt_bytes)
-    assert pt_bytes == ct_bytes
+    assert pt_bytes == ct_bytes, "AES CFB mode encryption failure"
     aes_cfb.reset()
     aes_cfb.decrypt(pt_bytes)
-    assert pt_bytes == pt_copy
+    assert pt_bytes == pt_copy, "AES CFB mode decryption failure"
 
 
 def test_ofb_aes256_f46():
@@ -186,10 +186,10 @@ def test_ofb_aes256_f46():
     pt_bytes = bytearray([int(v, 16) for v in re.findall(r'..?', pt_str)])
     aes_ofb = AES(mode='ofb', key=key_bytes, iv=iv_bytes)
     aes_ofb.decrypt(ct_bytes)
-    assert ct_bytes == pt_bytes
+    assert ct_bytes == pt_bytes, "AES OFB mode encryption failure"
     aes_ofb.reset()
     aes_ofb.encrypt(ct_bytes)
-    assert ct_bytes == ct_copy
+    assert ct_bytes == ct_copy, "AES OFB mode decryption failure"
 
 
 def test_ctr_aes192_f53():
@@ -217,7 +217,18 @@ def test_ctr_aes192_f53():
     ct_bytes = bytearray([int(v, 16) for v in re.findall(r'..?', ct_str)])
     aes_ctr = AES(mode='ctr', key=key_bytes, iv=counter_bytes)
     aes_ctr.encrypt(pt_bytes)
-    assert pt_bytes == ct_bytes
+    assert pt_bytes == ct_bytes, "AES CTR mode encryption failure"
     aes_ctr.reset()
     aes_ctr.decrypt(pt_bytes)
-    assert pt_bytes == pt_copy
+    assert pt_bytes == pt_copy, "AES CTR mode decryption failure"
+
+if __name__ == "__main__":
+    test_ecb_128()
+    test_ecb_256()
+    test_cbc_128_f21()
+    test_cbc_128_f22()
+    test_cfb128_aes192_f315()
+    test_ofb_aes256_f46()
+    test_ctr_aes192_f53()
+    print('All tests pass.')
+    

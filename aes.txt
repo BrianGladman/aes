@@ -2,7 +2,7 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
-Changes 6/12/2016)
+Changes (6/12/2016)
 ====================
 
 1. Changed function definition of has_aes_ni() to has_aes_ni(void), 

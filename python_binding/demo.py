@@ -20,11 +20,17 @@ data2 = data[151:]
 # Note: __PROFILE_AES__ must be defined when building the native
 # module in order for the print statements below to work
 aes_ctr = AES(mode='ctr', key=random_key, iv=random_iv)
-print('Encrypted data1 in: %5d cycles' % aes_ctr.encrypt(data1))
-print('Encrypted data2 in: %5d cycles' % aes_ctr.encrypt(data2))
+result = aes_ctr.encrypt(data1)
+if result:
+  print('Encrypted data1 in: %5d cycles' % result)
+result = aes_ctr.encrypt(data2)
+if result:
+  print('Encrypted data2 in: %5d cycles' % result)
 
 data_new = data1 + data2
 aes_ctr = AES(mode='ctr', key=random_key, iv=random_iv)
-print('Decrypted data in:  %5d cycles' % aes_ctr.decrypt(data_new))
+result = aes_ctr.decrypt(data_new)
+if result:
+  print('Decrypted data in:  %5d cycles' % result)
 
-print(data == data_new)
+assert data == data_new, "The demo has failed."

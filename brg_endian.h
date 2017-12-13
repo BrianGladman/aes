@@ -24,10 +24,9 @@ Issue Date: 20/12/2007
 #define IS_BIG_ENDIAN      4321 /* byte 0 is most significant (mc68k) */
 #define IS_LITTLE_ENDIAN   1234 /* byte 0 is least significant (i386) */
 
-/* required undefine when using clang with MSVC to
- * avoid including endian.h and byteswap.h which
- * are both not existing on Windows. */
-#if defined( _MSC_VER) && defined( __clang__ )
+/* This is needed when using clang with MSVC to avoid including */
+/* endian.h and byteswap.h which are not present on Windows     */
+#if defined( _MSC_VER ) && defined( __clang__ )
 #  undef __GNUC__
 #endif
 

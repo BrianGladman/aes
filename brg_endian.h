@@ -24,6 +24,13 @@ Issue Date: 20/12/2007
 #define IS_BIG_ENDIAN      4321 /* byte 0 is most significant (mc68k) */
 #define IS_LITTLE_ENDIAN   1234 /* byte 0 is least significant (i386) */
 
+/* required undefine when using clang with MSVC to
+ * avoid including endian.h and byteswap.h which
+ * are both not existing on Windows. */
+#if defined( _MSC_VER) && defined( __clang__ )
+#  undef __GNUC__
+#endif
+
 /* Include files where endian defines and byteswap functions may reside */
 #if defined( __sun )
 #  include <sys/isa_defs.h>

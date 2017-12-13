@@ -55,7 +55,7 @@ extern "C"
    so we need to control this with the following VC++ pragmas
 */
 
-#if defined( _MSC_VER ) && !defined( _WIN64 )
+#if defined( _MSC_VER ) && !defined( _WIN64 ) && !defined( __clang__ )
 #pragma optimize( "s", on )
 #endif
 
@@ -172,7 +172,7 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
    so we need to control this with the following VC++ pragmas
 */
 
-#if defined( _MSC_VER ) && !defined( _WIN64 )
+#if defined( _MSC_VER ) && !defined( _WIN64 ) && !defined( __clang__ )
 #pragma optimize( "t", on )
 #endif
 

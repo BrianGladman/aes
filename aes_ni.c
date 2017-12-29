@@ -23,6 +23,7 @@ Issue Date: 09/09/2014
 
 #if defined(_MSC_VER)
 
+#include <assert.h>
 #include <intrin.h>
 #pragma intrinsic(__cpuid)
 #define INLINE  __inline
@@ -89,6 +90,7 @@ AES_RETURN aes_ni(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
 	{
 		return aes_xi(encrypt_key128)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	t1 = _mm_loadu_si128((__m128i*)key);
 
@@ -165,6 +167,7 @@ AES_RETURN aes_ni(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
 	{
 		return aes_xi(encrypt_key192)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	t1 = _mm_loadu_si128((__m128i*)key);
 	t3 = _mm_loadu_si128((__m128i*)(key + 16));
@@ -253,6 +256,7 @@ AES_RETURN aes_ni(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
 	{
 		return aes_xi(encrypt_key256)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	t1 = _mm_loadu_si128((__m128i*)key);
 	t3 = _mm_loadu_si128((__m128i*)(key + 16));
@@ -320,6 +324,7 @@ AES_RETURN aes_ni(decrypt_key128)(const unsigned char *key, aes_decrypt_ctx cx[1
 	{
 		return aes_xi(decrypt_key128)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	if(aes_ni(encrypt_key128)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
 	{
@@ -337,6 +342,7 @@ AES_RETURN aes_ni(decrypt_key192)(const unsigned char *key, aes_decrypt_ctx cx[1
 	{
 		return aes_xi(decrypt_key192)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	if(aes_ni(encrypt_key192)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
 	{
@@ -353,6 +359,7 @@ AES_RETURN aes_ni(decrypt_key256)(const unsigned char *key, aes_decrypt_ctx cx[1
 	{
 		return aes_xi(decrypt_key256)(key, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	if(aes_ni(encrypt_key256)(key, (aes_encrypt_ctx*)cx) == EXIT_SUCCESS)
 	{
@@ -374,6 +381,7 @@ AES_RETURN aes_ni(encrypt)(const unsigned char *in, unsigned char *out, const ae
 	{
 		return aes_xi(encrypt)(in, out, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	t = _mm_xor_si128(_mm_loadu_si128((__m128i*)in), *(__m128i*)key);
 
@@ -413,6 +421,7 @@ AES_RETURN aes_ni(decrypt)(const unsigned char *in, unsigned char *out, const ae
 	{
 		return aes_xi(decrypt)(in, out, cx);
 	}
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
 	t = _mm_xor_si128(_mm_loadu_si128((__m128i*)in), *(__m128i*)key);
 
@@ -461,6 +470,7 @@ AES_RETURN aes_CBC_encrypt(const unsigned char *in,
     {
         return aes_cbc_encrypt(in, out, length, ivec, cx);
     }
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
     if(length % 16)
 		length = length / 16 + 1;
@@ -496,6 +506,7 @@ AES_RETURN aes_CBC_decrypt(const unsigned char *in,
     {
         return aes_cbc_decrypt(in, out, length, ivec, cx);
     }
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
     if(length % 16)
         length = length / 16 + 1;
@@ -550,6 +561,7 @@ AES_RETURN AES_CTR_encrypt(const unsigned char *in,
         *(uint32_t*)(ctr_blk + 8) = *(uint32_t*)nonce;
         return aes_ctr_crypt(in, out, length, (unsigned char*)ctr_blk, ctr_inc, cx);
     }
+	assert(ALIGN_OFFSET(cx, 16) == 0);
 
     if(length % 16)
         length = length / 16 + 1;

@@ -21,9 +21,10 @@ Issue Date: 09/09/2014
 
 #if defined( USE_INTEL_AES_IF_PRESENT )
 
+#include <assert.h>
+
 #if defined(_MSC_VER)
 
-#include <assert.h>
 #include <intrin.h>
 #pragma intrinsic(__cpuid)
 #define INLINE  __inline

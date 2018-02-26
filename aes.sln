@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LIBS", "LIBS", "{5EE12558-6ED1-46D6-BC5B-9F3F0A6CDEF9}"
 EndProject
@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MISC", "MISC", "{31E4824C-9F60-4E20-BBBF-DA9CFA368C57}"
 	ProjectSection(SolutionItems) = preProject
 		aes.txt = aes.txt
+		license.txt = license.txt
 		vb.txt = vb.txt
 		vbaxam.doc = vbaxam.doc
 		via_ace.txt = via_ace.txt
@@ -214,5 +215,8 @@ Global
 		{92DDCF67-3D58-4CF5-BA0B-152AF6EBE5D9} = {31E4824C-9F60-4E20-BBBF-DA9CFA368C57}
 		{6EC3A1E5-2B96-4402-A26B-0DF62A6D5631} = {31E4824C-9F60-4E20-BBBF-DA9CFA368C57}
 		{610EA316-6DAF-4F2E-9964-3457F6417180} = {31E4824C-9F60-4E20-BBBF-DA9CFA368C57}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {20B4599B-754F-4AB8-B2A2-00ABA5EE860B}
 	EndGlobalSection
 EndGlobal

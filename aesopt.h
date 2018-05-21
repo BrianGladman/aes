@@ -169,10 +169,15 @@ Issue Date: 20/12/2007
 #  define VIA_ACE_POSSIBLE
 #endif
 
-#if (defined( _WIN64 ) && defined( _MSC_VER )) \
- || (defined( __GNUC__ ) && defined( __x86_64__ )) \
- && !(defined( INTEL_AES_POSSIBLE ))
-#  define INTEL_AES_POSSIBLE
+/* AESNI is supported by all Windows x64 compilers, but for Linux/GCC
+   we have to test for SSE 2, SSE 3, and AES to before enabling it; */
+#if !defined( INTEL_AES_POSSIBLE )
+#  if defined( _WIN64 ) && defined( _MSC_VER ) \
+   || defined( __GNUC__ ) && defined( __x86_64__ ) && \
+	  defined( __SSE2__ ) && defined( __SSE3__ ) && \
+	  defined( __AES__ )
+#    define INTEL_AES_POSSIBLE
+#  endif
 #endif
 
 /*  Define this option if support for the Intel AESNI is required

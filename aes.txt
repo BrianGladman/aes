@@ -2,6 +2,11 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Change (21/05/2018)
+
+1. Properly dectect presence of AESNI when using GCC (my thanks to 
+   Peter Gutmann for this fix)
+
 Changes (6/12/2016)
 ====================
 

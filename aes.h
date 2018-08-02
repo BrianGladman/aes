@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 02/08/2018
 
  This file contains the definitions required to use AES in C. See aesopt.h
  for optimisation details.
@@ -38,7 +38,14 @@ extern "C"
 #define AES_192     /* if a fast 192 bit key scheduler is needed     */
 #define AES_256     /* if a fast 256 bit key scheduler is needed     */
 #define AES_VAR     /* if variable key size scheduler is needed      */
-#define AES_MODES   /* if support is needed for modes                */
+#if 1
+#  define AES_MODES /* if support is needed for modes in the C code  */
+#else
+/*                     if AES_NI support is needed for AES modes     */
+#  if 0
+#    define ADD_AESNI_MODE_CALLS
+#  endif
+#endif
 
 /* The following must also be set in assembler files if being used   */
 
@@ -205,10 +212,6 @@ typedef void cbuf_inc(unsigned char *cbuf);
 AES_RETURN aes_ctr_crypt(const unsigned char *ibuf, unsigned char *obuf,
             int len, unsigned char *cbuf, cbuf_inc ctr_inc, aes_encrypt_ctx cx[1]);
 
-#endif
-
-#if 0
-#  define ADD_AESNI_MODE_CALLS
 #endif
 
 #if 0 && defined( ADD_AESNI_MODE_CALLS )

@@ -40,11 +40,10 @@ extern "C"
 #define AES_VAR     /* if variable key size scheduler is needed      */
 #if 1
 #  define AES_MODES /* if support is needed for modes in the C code  */
-#else
-/*                     if AES_NI support is needed for AES modes     */
-#  if 0
-#    define ADD_AESNI_MODE_CALLS
-#  endif
+#endif              /* (these will use AES_NI if it is present)      */
+#if 0               /* add this to make direct calls to the AES_NI   */
+#                   /* implemented CBC and CTR modes available       */
+#   define ADD_AESNI_MODE_CALLS
 #endif
 
 /* The following must also be set in assembler files if being used   */
@@ -256,7 +255,7 @@ void aes_CBC_decrypt(const unsigned char *in,
     unsigned char *key,
     int number_of_rounds);
 
-void AES_CTR_encrypt(const unsigned char *in,
+void aes_CTR_encrypt(const unsigned char *in,
     unsigned char *out,
     const unsigned char ivec[8],
     const unsigned char nonce[4],

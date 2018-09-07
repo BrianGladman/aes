@@ -14,10 +14,10 @@ The included test suite is not intended to be a complete implementation of
 the NIST test vectors.  Rather, it is used to verify the correctness of the
 Python wrappers around the AES function calls.
 
-To build the binding in Visual Studio it is necessaey to set this line:
+To build the binding in Visual Studio it is necessary to set this line:
 
     <PYTHON_VERSION>37</PYTHON_VERSION>
 
 in the python_version.props file (in the aes\python_binding directory) to
-identifty the Python version for the build (the first two digits of the
+identify the Python version for the build (the first two digits of the
 version number without the decimal point, i.e. 37 identifies Python 3.7).

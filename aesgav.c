@@ -26,7 +26,7 @@ Issue Date: 20/12/2007
 //
 // where:
 //
-// each of the symbols in square brakets can be used in any combination so
+// each of the symbols in square brackets can be used in any combination so
 // that:
 //
 //         /t:[knec]  selects the tests to be used
@@ -212,7 +212,7 @@ void ecb_me(FILE *outf, f_ectx alg[1], const unsigned long blen, const unsigned 
 
         block_xor(key, ct + 2 * blen - klen, klen);
         block_out(ct_val, ct + blen, outf, blen);   // output ciphertext
-        block_copy(pt, ct + blen, blen);            // copy cipertext as next plaintext
+        block_copy(pt, ct + blen, blen);            // copy ciphertext as next plaintext
     }
 }
 

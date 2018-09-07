@@ -22,7 +22,7 @@ Issue Date: 20/12/2007
 //
 // where:
 //
-// each of the symbols in square brakets can be used in any combination so
+// each of the symbols in square brackets can be used in any combination so
 // that:
 //
 //         /t:[knec]  selects the tests to be used
@@ -196,7 +196,7 @@ void ref_test(const char *in_file, unsigned int it_cnt, enum test_type t_type, f
                     fe_cnt = test_cnt;
 
 #if defined( AES_DECRYPT )
-            if(t_type != cbc_me)                    // if ECB mode test decrytpion
+            if(t_type != cbc_me)                    // if ECB mode test decryption
             {
                 set_dec_key(algd, key, klen);       // set the key
 

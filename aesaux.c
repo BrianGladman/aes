@@ -193,7 +193,7 @@ unsigned char rand8(void)
     return (char)(r4 >> (8 * r_cnt++));
 }
 
-// fill a block with random charactrers
+// fill a block with random characters
 
 void block_rndfill(unsigned char l[], unsigned long len)
 {   unsigned long  i;

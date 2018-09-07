@@ -51,7 +51,7 @@ extern "C"
 #if ( FUNCS_IN_C & ENCRYPTION_IN_C )
 
 /* Visual C++ .Net v7.1 provides the fastest encryption code when using
-   Pentium optimization with small code but this is poor for decryption
+   Pentium optimisation with small code but this is poor for decryption
    so we need to control this with the following VC++ pragmas
 */
 
@@ -168,7 +168,7 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
 #if ( FUNCS_IN_C & DECRYPTION_IN_C)
 
 /* Visual C++ .Net v7.1 provides the fastest encryption code when using
-   Pentium optimization with small code but this is poor for decryption
+   Pentium optimisation with small code but this is poor for decryption
    so we need to control this with the following VC++ pragmas
 */
 

@@ -36,7 +36,8 @@ Issue Date: 20/12/2007
 #elif defined( __FreeBSD__ ) || defined( __OpenBSD__ ) || defined( __NetBSD__ )
 #  include <sys/endian.h>
 #elif defined( BSD ) && ( BSD >= 199103 ) || defined( __APPLE__ ) || \
-      defined( __CYGWIN32__ ) || defined( __DJGPP__ ) || defined( __osf__ )
+      defined( __CYGWIN32__ ) || defined( __DJGPP__ ) || defined( __osf__ ) || \
+      defined(HAVE_MACHINE_ENDIAN)
 #  include <machine/endian.h>
 #elif defined( __linux__ ) || defined( __GNUC__ ) || defined( __GNU_LIBRARY__ )
 #  if !defined( __MINGW32__ ) && !defined( _AIX )
@@ -85,6 +86,13 @@ Issue Date: 20/12/2007
 #  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
 #elif defined( __LITTLE_ENDIAN )
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+#endif
+
+#if !defined(__BIG_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__)
+#  define __BIG_ENDIAN__ __ORDER_BIG_ENDIAN__
+#endif
+#if !defined(__LITTLE_ENDIAN__) && defined(__ORDER_LITTLE_ENDIAN__)
+#  define __LITTLE_ENDIAN__ __ORDER_LITTLE_ENDIAN__
 #endif
 
 #if defined( __BIG_ENDIAN__ ) && defined( __LITTLE_ENDIAN__ )

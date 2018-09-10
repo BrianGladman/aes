@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 10/09/2018
 */
 
 #ifndef _BRG_ENDIAN_H
@@ -48,8 +48,20 @@ Issue Date: 20/12/2007
 #endif
 
 /* Now attempt to set the define for platform byte order using any  */
-/* of the four forms SYMBOL, _SYMBOL, __SYMBOL & __SYMBOL__, which  */
-/* seem to encompass most endian symbol definitions                 */
+/* of the four forms SYMBOL, _SYMBOL, __SYMBOL & __SYMBOL__, ...    */
+/* which seem to encompass most endian symbol definitions           */
+
+#if defined( __ORDER_BIG_ENDIAN__ ) && defined( __ORDER_LITTLE_ENDIAN__ )
+#  if defined( __BYTE_ORDER__ ) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#    define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
+#  elif defined( __BYTE_ORDER__ ) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+#  endif
+#elif defined( __ORDER_BIG_ENDIAN__ )
+#  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
+#elif defined( __ORDER_LITTLE_ENDIAN__ )
+#  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+#endif
 
 #if defined( BIG_ENDIAN ) && defined( LITTLE_ENDIAN )
 #  if defined( BYTE_ORDER ) && BYTE_ORDER == BIG_ENDIAN

@@ -88,13 +88,6 @@ Issue Date: 20/12/2007
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
 #endif
 
-#if !defined(__BIG_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__)
-#  define __BIG_ENDIAN__ __ORDER_BIG_ENDIAN__
-#endif
-#if !defined(__LITTLE_ENDIAN__) && defined(__ORDER_LITTLE_ENDIAN__)
-#  define __LITTLE_ENDIAN__ __ORDER_LITTLE_ENDIAN__
-#endif
-
 #if defined( __BIG_ENDIAN__ ) && defined( __LITTLE_ENDIAN__ )
 #  if defined( __BYTE_ORDER__ ) && __BYTE_ORDER__ == __BIG_ENDIAN__
 #    define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
@@ -105,6 +98,16 @@ Issue Date: 20/12/2007
 #  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
 #elif defined( __LITTLE_ENDIAN__ )
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+#endif
+
+#if !defined(PLATFORM_BYTE_ORDER) && defined( __GNUC__ ) && \
+    defined( __BYTE_ORDER__ ) && defined(__ORDER_BIG_ENDIAN__) && \
+    defined(__ORDER_LITTLE_ENDIAN__)
+#  if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#    define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
+#  elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+#  endif
 #endif
 
 /*  if the platform byte order could not be determined, then try to */

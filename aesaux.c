@@ -20,8 +20,8 @@ Issue Date: 20/12/2007
 
 #ifndef __GNUC__
 #  include <windows.h>
+#  include <direct.h>
 #endif
-#include <direct.h>
 #include "aes.h"
 #include "aesaux.h"
 #include "aestst.h"
@@ -344,7 +344,7 @@ void block_out(const enum line_type ty, const unsigned char b[], FILE *outf, con
     fprintf(outf, "\n%s", fstr[ty]);
 
     if(ty <= test_no)
-        fprintf(outf, "%i", len);
+        fprintf(outf, "%lu", len);
     else
         for(i = 0; i < len; ++i)
             fprintf(outf, "%c%c", hxx[(b[i] >> 4) & 15], hxx[b[i] & 15]);

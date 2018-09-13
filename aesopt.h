@@ -194,8 +194,12 @@ Issue Date: 20/12/2007
 	code files must match that here if they are used). 
 */
 
-#if 1 && defined( INTEL_AES_POSSIBLE ) && !defined( USE_INTEL_AES_IF_PRESENT )
-#  define USE_INTEL_AES_IF_PRESENT
+#if defined( INTEL_AES_POSSIBLE )
+#  if 1 && !defined( USE_INTEL_AES_IF_PRESENT )
+#    define USE_INTEL_AES_IF_PRESENT
+#  endif
+#elif defined( USE_INTEL_AES_IF_PRESENT )
+#  error: AES_NI is not available on this platform
 #endif
 
 /*  Define this option if support for the VIA ACE is required. This uses

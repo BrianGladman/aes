@@ -77,7 +77,9 @@
 ; Comment in/out the following lines to obtain the desired subroutines. These
 ; selections MUST match those in the C header files aes.h and aesopt.h
 
+%ifdef INTEL_AES_POSSIBLE
 %define USE_INTEL_AES_IF_PRESENT
+%endif
 %define AES_128                 ; define if AES with 128 bit keys is needed
 %define AES_192                 ; define if AES with 192 bit keys is needed
 %define AES_256                 ; define if AES with 256 bit keys is needed

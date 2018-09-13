@@ -447,7 +447,7 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
     int        i;
     FILE       *outf;
 
-    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %i, key size = %i)\n",
+    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %i, key size = %lu)\n",
             (do_cmp ? " and verify" : ""), 8 * blen, 8 * klen);
 
     for(i = 0; i < 8; ++i)  // for each type of test /k /x /e /c (2 tests each)

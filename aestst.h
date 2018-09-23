@@ -28,10 +28,10 @@ Issue Date: 20/12/2007
 
 #define DYNAMIC_LINK
 
-#define abs_path    ".\\"
-#define rel_path    "..\\"
-#define ref_path    "testvals\\"                    // path for test vector files
-#define out_path    "outvals\\"                     // path for output files
+#define abs_path    "./"
+#define rel_path    "../"
+#define ref_path    "testvals/"                    // path for test vector files
+#define out_path    "outvals/"                     // path for output files
 #if 0
 #  define ar_path   abs_path
 #else

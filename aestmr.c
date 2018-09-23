@@ -23,9 +23,12 @@ Issue Date: 20/12/2007
 
 #define DUAL_CORE
 
-#if defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER )
 #  define WINDOWS_LEAN_AND_MEAN
 #  include <windows.h>
+#elif defined( __GNUC__ )
+#  define _GNU_SOURCE
+#  include <sched.h>
 #endif
 #include <string.h>
 #include <math.h>
@@ -51,10 +54,10 @@ fn_ptrs fn;
 #else
 #define PROCESSOR   ""
 #endif
-#elif defined( _M_X64 )
+#elif defined( _M_X64 ) || defined( __x86_64__ )
 #define PROCESSOR   "AMD64/EMT64"
 #else
-#define PROCESSOR   ""
+#define PROCESSOR   "(Unknown)"
 #endif
 
 const int loops = 100; // number of timing loops
@@ -779,25 +782,25 @@ void output(FILE *outf, const unsigned long inx, const unsigned long bits)
 {   unsigned long  t;
     unsigned char  c0, c1, c2;
 
-    fprintf(outf, "\n// %i Bit: ", 8 * kl[inx]);
-    fprintf(outf, "   Key Setup: %i/%i cycles", ekt[inx], dkt[inx]);
+    fprintf(outf, "\n// %li Bit: ", 8 * kl[inx]);
+    fprintf(outf, "   Key Setup: %f/%f cycles", ekt[inx], dkt[inx]);
     t = (unsigned long)((1000 * bits + et[inx] / 2) / et[inx]);
     c0 = (unsigned char)('0' + t / 100);
     c1 = (unsigned char)('0' + (t / 10) % 10);
     c2 = (unsigned char)('0' + t % 10);
-    fprintf(outf, "\n// Encrypt:   %i  cycles = 0.%c%c%c bits/cycle", et[inx], c0, c1 , c2);
+    fprintf(outf, "\n// Encrypt:   %f  cycles = 0.%c%c%c bits/cycle", et[inx], c0, c1 , c2);
     t = (unsigned long)((1000 * bits + dt[inx] / 2) / dt[inx]);
     c0 = (unsigned char)('0' + t / 100);
     c1 = (unsigned char)('0' + (t / 10) % 10);
     c2 = (unsigned char)('0' + t % 10);
-    fprintf(outf, "\n// Decrypt:   %i  cycles = 0.%c%c%c bits/cycle", dt[inx], c0, c1 , c2);
+    fprintf(outf, "\n// Decrypt:   %f  cycles = 0.%c%c%c bits/cycle", dt[inx], c0, c1 , c2);
 }
 
 #if defined( _WIN64 )
 
 #define CurrentProcessorNumber GetCurrentProcessorNumber
 
-#else
+#elif defined( _WIN32 )
 
 unsigned long CurrentProcessorNumber(void)
 {
@@ -842,6 +845,14 @@ int main(int argc, char *argv[])
     {
         printf("Couldn't get Process Affinity Mask\n\n"); return -1;
     }
+#elif defined( DUAL_CORE ) && defined( __GNUC__ )
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    CPU_SET(0, &cpu_set);
+    if(sched_setaffinity(0, sizeof(cpu_set_t), &cpu_set) == -1)
+    {
+        perror("Unable to set CPU affinity mask"); return -1;
+    }
 #endif
 
 #if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
@@ -854,12 +865,15 @@ int main(int argc, char *argv[])
     memset(&alge, 0, sizeof(aes_encrypt_ctx));
     memset(&algd, 0, sizeof(aes_decrypt_ctx));
 
-    if(fopen_s(&outf, argc == 2 ? argv[1] : "CON", "w"))
-    {
-        printf("\nCannot open %s for output\n", argc == 2 ? argv[1] : "CON");
-        return -1;
+    if(argc == 2) {
+        if (!(outf = fopen(argv[1], "w"))) {
+            printf("\nCannot open %s for output\n", argv[1]);
+            return -1;
+        }
+    } else {
+        outf = stdout;
     }
-    printf("\n// AES%s Timing For The %s Processor",
+    printf("\n// AES%s Timing For The %s Processor\n",
 #if defined( DLL_IMPORT ) && defined( __cplusplus )
         " (DLL & CPP)",
 #elif defined(  DLL_IMPORT )
@@ -920,5 +934,7 @@ int main(int argc, char *argv[])
     if(h_dll) FreeLibrary(h_dll);
 #endif
     fprintf(outf, "\n\n");
+    if(argc == 2)
+        fclose(outf);
     return 0;
 }

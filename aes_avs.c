@@ -42,7 +42,7 @@ char *klen_str[] = { "128",  "192",  "256" };
 typedef enum { L_bad = -1, L_count = 0, L_key, L_iv, L_plaintext, L_ciphertext } line_type;
 char *hdr_str[] = { "COUNT = ", "KEY = ", "IV = ", "PLAINTEXT = ", "CIPHERTEXT = " };
 
-char *test_path = "..\\testvals\\fax\\";
+char *test_path = "../testvals/fax/";
 char *hxx = "0123456789abcdef";
 
 int to_hex(int ch)
@@ -98,7 +98,7 @@ int find_string(const char *s1, const char s2[])
     return -1;
 }
 
-enum line_type find_line(FILE *inf, char str[], char **p)
+line_type find_line(char str[], char **p)
 {   int i;
 
     for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
@@ -240,10 +240,13 @@ void run_aes_avs_test(mode mm, type tt)
         strcat(path, klen_str[i]);
         strcat(path, ".fax");
         if(!(f = fopen(path, "r")))
-            return EXIT_FAILURE;
+        {
+            printf("\nUnable to open %s for reading", path);
+            return;
+        }
         while(get_line(f, inbuf) == EXIT_SUCCESS)
         {
-            if((ty = find_line(f, inbuf, &p)) != L_bad)
+            if((ty = find_line(inbuf, &p)) != L_bad)
                 switch(ty)
                 {
                 case L_count:

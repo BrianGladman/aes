@@ -38,9 +38,12 @@ Issue Date: 20/12/2007
 // code implements one additional (all zero) test vector as the first
 // vector in each set (test 0).
 
-#if defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER )
 #  define WINDOWS_LEAN_AND_MEAN
 #  include <windows.h>
+#  define ALIGNED __declspec(align(16))
+#else
+#  define ALIGNED __attribute__ ((aligned(16)))
 #endif
 
 #if defined( __cplusplus )
@@ -96,12 +99,12 @@ void set_dec_key(f_dctx algd[1], unsigned char key[], unsigned long klen)
 void ref_test(const char *in_file, unsigned int it_cnt, enum test_type t_type, f_ectx alge[1],
                                         f_dctx algd[1], unsigned long blen, unsigned long klen)
 {   unsigned long        i, test_cnt, cnt, e_cnt, fe_cnt;
-    __declspec(align(16)) unsigned char key[32], pt[32], iv[32], ect[32], act[64];
+    ALIGNED unsigned char key[32], pt[32], iv[32], ect[32], act[64];
     char                str[128];
     enum line_type      ty;
     FILE                *inf;
 
-    if(fopen_s(&inf, in_file, "r"))      // reference test vector file
+    if(!(inf = fopen(in_file, "r")))     // reference test vector file
     {
         printf("Cannot find test vector file (%s)\n", in_file); return;
     }
@@ -262,7 +265,7 @@ void ref_test(const char *in_file, unsigned int it_cnt, enum test_type t_type, f
     fclose(inf);
 
     if(e_cnt > 0)
-        printf("%i ERRORS during test (first on test %i)\n", e_cnt, fe_cnt);
+        printf("%li ERRORS during test (first on test %li)\n", e_cnt, fe_cnt);
     else
         printf("all tests correct\n");
 }

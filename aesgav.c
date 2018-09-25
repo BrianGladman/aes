@@ -45,7 +45,7 @@ Issue Date: 20/12/2007
 // test vector sequences, this code implements one additional (all zero)
 // test vector as the first vector in each set (test 0).
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER )
 #include <windows.h>
 #endif
 
@@ -447,7 +447,7 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
     int        i;
     FILE       *outf;
 
-    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %i, key size = %lu)\n",
+    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %li, key size = %lu)\n",
             (do_cmp ? " and verify" : ""), 8 * blen, 8 * klen);
 
     for(i = 0; i < 8; ++i)  // for each type of test /k /x /e /c (2 tests each)

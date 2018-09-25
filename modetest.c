@@ -20,7 +20,7 @@ Issue Date: 20/12/2007
 
 #define DUAL_CORE
 
-#if defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK ))
 #include <windows.h>
 #endif
 #include <stdio.h>

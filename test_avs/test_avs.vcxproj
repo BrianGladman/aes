@@ -178,6 +178,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\aesaux.c" />
     <ClCompile Include="..\aes_avs.c" />
   </ItemGroup>
   <ItemGroup>

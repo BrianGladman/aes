@@ -93,6 +93,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\aesaux.c" />
     <ClCompile Include="..\tablegen.c" />
   </ItemGroup>
   <ItemGroup>

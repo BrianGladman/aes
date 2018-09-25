@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 25/09/2018
 */
 
 #ifndef AESAUX_H
@@ -51,7 +51,7 @@ const char *pos(const char *s);
 int to_hex(int ch);
 int get_line(FILE *inf, char s[]);
 char *copy_str(char *s, const char *fstr);
-char *df_string(const char *p);
+const char *df_string(const char *p);
 int block_in(unsigned char l[], const char *p);
 void block_clear(unsigned char l[], const unsigned long len);
 void block_reverse(unsigned char l[], const unsigned long len);
@@ -70,6 +70,10 @@ enum line_type find_line(FILE *inf, char str[]);
 void block_out(const enum line_type ty, const unsigned char b[], FILE *outf, const unsigned long len);
 #if defined( DLL_IMPORT ) && defined(  DYNAMIC_LINK  )
   HINSTANCE init_dll(fn_ptrs *fn);
+#endif
+
+#if !defined( _MSC_VER )
+  int fopen_s(FILE** pFile, const char *filename, const char *mode);
 #endif
 
 #if defined(__cplusplus)

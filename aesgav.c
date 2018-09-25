@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 25/09/2018
 */
 
 // AES Algorithm Test - Generate local test files for KAT and Monte Carlo
@@ -45,7 +45,7 @@ Issue Date: 20/12/2007
 // test vector sequences, this code implements one additional (all zero)
 // test vector as the first vector in each set (test 0).
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER ) && defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
 #include <windows.h>
 #endif
 
@@ -344,16 +344,12 @@ void comp_vecs(const char *fn1, const char *fn2)
 
     err_cnt = np_cnt = 0; req = TRUE;
 
-    if1 = fopen(fn1, "r");
-
-    if(!if1)   // open first file
+    if(fopen_s(&if1, fn1, "r"))
     {
         printf("\n*** 1st file (%s) not found ***", fn1); return;
     }
 
-    if2 = fopen(fn2, "r");
-
-    if(!if2)   // open second file
+    if(fopen_s(&if2, fn2, "r"))
     {
         printf("\n*** 2nd file (%s) not found ***", fn2); return;
     }
@@ -447,7 +443,7 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
     int        i;
     FILE       *outf;
 
-    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %i, key size = %lu)\n",
+    printf("\nGenerate%s tests for aes (AES_BLOCK_SIZE = %lu, key size = %lu)\n",
             (do_cmp ? " and verify" : ""), 8 * blen, 8 * klen);
 
     for(i = 0; i < 8; ++i)  // for each type of test /k /x /e /c (2 tests each)
@@ -461,8 +457,7 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
             file_name(sp1, 128, i, blen, klen);
             copy_str(sp2, sp1);
 
-            outf = fopen(name1, "w");
-            if(outf)      // if output file is open write it
+            if(fopen_s(&outf, name1, "w"))
             {
                 header(outf, i, blen, klen);
                 f_ptr[i](outf, alg, blen, klen);

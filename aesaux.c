@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 25/09/2018
 */
 
 #ifndef __GNUC__
@@ -46,6 +46,23 @@ char *file_name(char* buf, size_t len, const unsigned long type, const unsigned 
     *sp = '\0';
     return buf;
 }
+
+#if !defined( _MSC_VER )
+int fopen_s(FILE** pFile, const char *filename, const char *mode)
+{	char ul_name[64], *d = ul_name;
+    char *s = filename;
+	FILE * fp;
+
+	do
+	{
+		*d++ = (*s == '\\' ? '/' : *s);
+	}
+	while(*s++);
+
+	*pFile = fp = fopen(ul_name, mode);
+	return fp == NULL;
+}
+#endif
 
 const char *pos(const char *s)
 {
@@ -87,8 +104,8 @@ char *copy_str(char *d, const char *s)
     return d;
 }
 
-char *df_string(const char *f)
-{   char *p = f, *p1, *p2;
+const char *df_string(const char *f)
+{   const char *p = f, *p1, *p2;
  
     p1 = p2 = 0;
     while(*p)

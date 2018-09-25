@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <YASM>
-      <Defines>DLL_EXPORT;ASM_AMD64_C;_SEH_</Defines>
+      <Defines>DLL_EXPORT;ASM_AMD64_C;_SEH_;INTEL_AES_POSSIBLE</Defines>
     </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -90,7 +90,7 @@ copy "$(TargetDir)$(TargetName).pdb" "$(TargetDir)aes.pdb"
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <YASM>
-      <Defines>DLL_EXPORT;ASM_AMD64_C;_SEH_</Defines>
+      <Defines>DLL_EXPORT;ASM_AMD64_C;_SEH_;INTEL_AES_POSSIBLE</Defines>
     </YASM>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>

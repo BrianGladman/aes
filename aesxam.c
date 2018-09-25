@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 20/12/2007
+Issue Date: 25/09/2018
 */
 
 //  An example of the use of AES (Rijndael) for file encryption.  This code
@@ -116,6 +116,24 @@ Issue Date: 20/12/2007
 
 #include "aes.h"
 #include "rdtsc.h"
+
+#if !defined( _MSC_VER ) 
+// substitute for MSVC fopen_s() on Unix/Linux
+int fopen_s(FILE** pFile, const char *filename, const char *mode)
+{
+	char ul_name[64], *d = ul_name;
+	char *s = filename;
+	FILE * fp;
+
+	do{
+		*d++ = (*s == '\\' ? '/' : *s);
+	}
+	while(*s++);
+
+	*pFile = fp = fopen(ul_name, mode);
+	return fp == NULL;
+}
+#endif
 
 #define BLOCK_LEN   16
 
@@ -376,13 +394,13 @@ int main(int argc, char *argv[])
 
     key_len = i / 2;
 
-    if(!(fin = fopen(argv[1], "rb")))   // try to open the input file
+    if(fopen_s(&fin, argv[1], "rb"))   // try to open the input file
     {
         printf("The input file: %s could not be opened\n", argv[1]);
         err = -5; goto exit;
     }
 
-    if(!(fout = fopen(argv[2], "wb")))  // try to open the output file
+    if(fopen_s(&fout, argv[2], "wb"))  // try to open the output file
     {
         printf("The output file: %s could not be opened\n", argv[2]);
         err = -6; goto exit;

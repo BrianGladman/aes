@@ -244,8 +244,13 @@ void wtab_4(FILE *f, unsigned char *h, const unsigned int t[4][256])
 
 int main(void)
 {   FILE *f;
+    char *fn = "aestab2.c";
 
-    f = fopen("aestab2.c", "w");
+    if(fopen_s(&f, fn, "w"))
+	{
+		printf("\nCannot open %s for output\n", fn);
+		return -1;
+	}
 
     fprintf(f, "\n#include \"aes.h\"\n");
     fprintf(f, "\n#define RC_LENGTH   (5 * (AES_BLOCK_SIZE / 4 - 2))\n");

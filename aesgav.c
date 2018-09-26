@@ -457,7 +457,7 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
             file_name(sp1, 128, i, blen, klen);
             copy_str(sp2, sp1);
 
-            if(fopen_s(&outf, name1, "w"))
+            if(!fopen_s(&outf, name1, "w"))
             {
                 header(outf, i, blen, klen);
                 f_ptr[i](outf, alg, blen, klen);

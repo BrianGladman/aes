@@ -107,7 +107,7 @@ int find_string(const char *s1, const char s2[])
     return -1;
 }
 
-enum line_type find_line2(FILE *inf, char str[], char **p)
+enum line_type find_line(char str[], char **p)
 {   int i;
 
     for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
@@ -269,7 +269,7 @@ void run_aes_avs_test(mode mm, type tt)
         }
         while(get_line(f, inbuf) == EXIT_SUCCESS)
         {
-            if((ty = find_line2(f, inbuf, p)) != L_bad)
+            if((ty = find_line(inbuf, p)) != L_bad)
                 switch(ty)
                 {
                 case L_count:

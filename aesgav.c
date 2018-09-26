@@ -45,7 +45,7 @@ Issue Date: 25/09/2018
 // test vector sequences, this code implements one additional (all zero)
 // test vector as the first vector in each set (test 0).
 
-#if defined( _MSC_VER ) && defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( _MSC_VER ) && defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 #include <windows.h>
 #endif
 
@@ -57,7 +57,7 @@ Issue Date: 25/09/2018
 #include "aesaux.h"
 #include "aestst.h"
 
-#if defined(USE_DLL)
+#if defined(DLL_IMPORT) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
 #endif
 
@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
 {   int do_cmp, tyf[4], kf[3], ki;
     f_ectx alg[1];
 
-#if defined(USE_DLL) && defined(DYNAMIC_LINK)
+#if defined(DLL_IMPORT) && defined(DLL_DYNAMIC_LOAD)
     HINSTANCE   h_dll;
     if(!(h_dll = init_dll(&fn)))
         return -1;
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
 
     printf("\nRun tests for the AES algorithm %s",
 
-#if defined(USE_DLL)
+#if defined(DLL_IMPORT)
     " (DLL Version)\n");
 #elif defined(AES_CPP)
     " (CPP Version)\n");
@@ -534,7 +534,7 @@ int main(int argc, char *argv[])
         do_tests(do_cmp, tyf, alg, 16, 16 + 8 * ki);
     }
 
-#if defined(USE_DLL) && defined(DYNAMIC_LINK)
+#if defined(DLL_IMPORT) && defined(DLL_DYNAMIC_LOAD)
     if(h_dll) FreeLibrary(h_dll);
 #endif
     printf("\n\n");

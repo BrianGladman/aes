@@ -367,7 +367,7 @@ void block_out(const enum line_type ty, const unsigned char b[], FILE *outf, con
             fprintf(outf, "%c%c", hxx[(b[i] >> 4) & 15], hxx[b[i] & 15]);
 }
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 
 HINSTANCE init_dll(fn_ptrs *fn)
 {   HINSTANCE   h_dll;

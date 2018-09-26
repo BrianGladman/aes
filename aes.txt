@@ -2,7 +2,20 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Change (26/09/2018)
+===================
+
+1. Changes to test programs to allow them to be built on Linux/GCC
+   (with thanks to Michael Mohr).
+
+2. Rationalisation of the defines DLL_IMPORT, DYNAMIC_DLL and USE_DLL
+   in the test code - now DLL_IMPORT and DLL_DYNAMIC_LOAD
+
+3. Update the test_avs test to allow the testing of static, DLL and
+   dynamically loaded DLL libraries.
+
 Change (21/05/2018)
+===================
 
 1. Properly dectect presence of AESNI when using GCC (my thanks to 
    Peter Gutmann for this fix)
@@ -366,9 +379,13 @@ built.  These use the files:
         C source:   aesaux.c, aestmr.c
         defines:    DLL_IMPORT
 
-and link to the DLL using dynamic (run-time) linking.  However, if the lib file
-associated with the DLL is linked into this project and the symbol DYNAMIC_LINK
-in aestst.h is left undefined, then implicit linking will be used
+and default to linkingto with the AES DLL using dynamic (run-time) linking.  Implicit
+linking can be used by adding the lib file associated with the AES DLL (in the aes\dll
+sub-directory) to the build (under project Properties|Linker in Visual Studio) and 
+removing the DLL_DYNAMIC_LOAD define (under project Properties|C/C++|Preprocessor).
+
+0  Link is linked into this project and the symbol
+DLL_DYNAMIC_LOAD is left undefined, then implicit linking will be used
 
 The above tests take command line arguments that determine which test are run
 as follows:
@@ -601,5 +618,5 @@ Please note the following IMPORTANT points about the AES mode subroutines:
        of mode (but encryption and decryption keys must 
        both be set if they are needed).  
        
-   Brian Gladman  14/11/2014
+   Brian Gladman  26/09/2018
  

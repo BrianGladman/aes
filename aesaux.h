@@ -68,7 +68,7 @@ int test_args(int argc, char *argv[], char des_chr, char tst_chr);
 int find_string(const char *s1, const char s2[]);
 enum line_type find_line(FILE *inf, char str[]);
 void block_out(const enum line_type ty, const unsigned char b[], FILE *outf, const unsigned long len);
-#if defined( DLL_IMPORT ) && defined(  DYNAMIC_LINK  )
+#if defined( DLL_IMPORT ) && defined(  DLL_DYNAMIC_LOAD  )
   HINSTANCE init_dll(fn_ptrs *fn);
 #endif
 

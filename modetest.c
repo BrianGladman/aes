@@ -20,7 +20,7 @@ Issue Date: 20/12/2007
 
 #define DUAL_CORE
 
-#if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK ))
+#if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD ))
 #include <windows.h>
 #endif
 #include <stdio.h>
@@ -53,7 +53,7 @@ Issue Date: 20/12/2007
 //#define WHOLE_BLOCKS
 #define VALIDATE_IN_TIMING
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
 #endif
 
@@ -1244,7 +1244,7 @@ int main(void)
     aligned_auto(f_ectx, ecx2, 1, 16);
     aligned_auto(f_dctx, dcx2, 1, 16);
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     HINSTANCE   h_dll;
 #endif
 
@@ -1269,7 +1269,7 @@ int main(void)
     }
 #endif
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     if(!(h_dll = init_dll(&fn)))
         return -1;
 #elif !defined(STATIC_TABLES)
@@ -1732,7 +1732,7 @@ int main(void)
 
 #endif
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     if(h_dll) FreeLibrary(h_dll);
 #endif
     printf("\n\n");

@@ -23,7 +23,7 @@ Issue Date: 20/12/2007
 
 #define DUAL_CORE
 
-#if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK ))
+#if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD ))
 #  define WINDOWS_LEAN_AND_MEAN
 #  include <windows.h>
 #elif defined(__GNUC__)
@@ -43,7 +43,7 @@ Issue Date: 20/12/2007
 #include "aestst.h"
 #include "rdtsc.h"
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
 #endif
 
@@ -823,7 +823,7 @@ int main(int argc, char *argv[])
     double   a0, av, sig;
     int ki, i, w;
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     HINSTANCE   h_dll;
 #endif
 
@@ -855,7 +855,7 @@ int main(int argc, char *argv[])
 }
 #endif
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     if(!(h_dll = init_dll(&fn)))
         return -1;
 #else 
@@ -933,7 +933,7 @@ int main(int argc, char *argv[])
         fprintf(outf, "%10.1f (%4.1f%%)", av, sig);
     }
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
     if(h_dll) FreeLibrary(h_dll);
 #endif
     fprintf(outf, "\n\n");

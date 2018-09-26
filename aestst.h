@@ -26,8 +26,6 @@ Issue Date: 20/12/2007
 #ifndef AESTST_H
 #define AESTST_H
 
-#define DYNAMIC_LINK
-
 #define abs_path    ".\\"
 #define rel_path    "..\\"
 #define ref_path    "testvals\\"                    // path for test vector files
@@ -52,7 +50,7 @@ Issue Date: 20/12/2007
 
 #define dll_path    "..\\dll\\" PLFRM CNFIG "aes.dll"   // path for DLL
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 
 #include <windows.h>
 

@@ -39,7 +39,7 @@ Issue Date: 20/12/2007
 // vector in each set (test 0).
 
 #if defined( _MSC_VER )
-#  if defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#  if defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 #    define WINDOWS_LEAN_AND_MEAN
 #    include <windows.h>
 #  endif
@@ -56,7 +56,7 @@ Issue Date: 20/12/2007
 #include "aesaux.h"
 #include "aestst.h"
 
-#if defined( DLL_IMPORT ) && defined( DYNAMIC_LINK )
+#if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
 #endif
 
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
     f_ectx   alge[1];
     f_dctx   algd[1];
 
-#if defined( DLL_IMPORT ) && defined(  DYNAMIC_LINK  )
+#if defined( DLL_IMPORT ) && defined(  DLL_DYNAMIC_LOAD  )
     HINSTANCE   h_dll;
     if(!(h_dll = init_dll(&fn)))
         return -1;
@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
         do_tests(vkt, vktn, ecb, cbc, alge, algd, 16, 16 + 8 * ki);
     }
 
-#if defined( DLL_IMPORT ) && defined(  DYNAMIC_LINK  )
+#if defined( DLL_IMPORT ) && defined(  DLL_DYNAMIC_LOAD  )
     if(h_dll) FreeLibrary(h_dll);
 #endif
     printf("\n\n");

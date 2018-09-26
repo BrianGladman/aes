@@ -40,8 +40,8 @@ char *file_name(char* buf, size_t len, const unsigned long type, const unsigned 
         return 0;
     sp = copy_str(buf, (type < 6 ? "ecb" : "cbc"));
     sp = copy_str(sp, st[type]);
-    *sp++ = ('0' + (char)blen / 4);
-    *sp++ = ('0' + (char)klen / 4);
+    *sp++ = (char)('0' + (char)blen / 4);
+    *sp++ = (char)('0' + (char)klen / 4);
     sp = copy_str(sp, ".txt");
     *sp = '\0';
     return buf;
@@ -50,12 +50,12 @@ char *file_name(char* buf, size_t len, const unsigned long type, const unsigned 
 #if !defined( _MSC_VER )
 int fopen_s(FILE** pFile, const char *filename, const char *mode)
 {	char ul_name[64], *d = ul_name;
-    char *s = filename;
+	const char *s = filename;
 	FILE * fp;
 
 	do
 	{
-		*d++ = (*s == '\\' ? '/' : *s);
+		*d++ = (char)(*s == '\\' ? '/' : *s);
 	}
 	while(*s++);
 

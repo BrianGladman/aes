@@ -122,11 +122,11 @@ Issue Date: 25/09/2018
 int fopen_s(FILE** pFile, const char *filename, const char *mode)
 {
 	char ul_name[64], *d = ul_name;
-	char *s = filename;
+	const char *s = filename;
 	FILE * fp;
 
 	do{
-		*d++ = (*s == '\\' ? '/' : *s);
+		*d++ = (char)(*s == '\\' ? '/' : *s);
 	}
 	while(*s++);
 

@@ -21,6 +21,7 @@ Issue Date: 20/12/2007
 #define DO_TABLES
 
 #include <stdio.h>
+#include "aesaux.h"
 #include "aesopt.h"
 
 #define sb_data(w) {\

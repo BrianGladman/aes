@@ -24,6 +24,7 @@ Issue Date: 25/09/2018
 #include <ctype.h>
 
 #include "aes.h"
+#include "aesaux.h"
 
 #define BLOCK_SIZE       16
 #define MAX_TEXT_SIZE   256
@@ -173,10 +174,13 @@ void run_aes_avs_test(mode mm, type tt)
         strcat(path, klen_str[i]);
         strcat(path, ".fax");
         if(fopen_s(&f, path, "r"))
-            return EXIT_FAILURE;
+        {
+            printf("\nUnable to open %s for reading", path);
+            return;
+        }
         while(get_line(f, inbuf) == EXIT_SUCCESS)
         {
-            if((ty = find_line(f, inbuf, &p)) != L_bad)
+            if((ty = find_line(f, inbuf)) != L_bad)
                 switch(ty)
                 {
                 case L_count:

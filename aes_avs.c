@@ -28,7 +28,7 @@ Issue Date: 25/09/2018
 
 #include "aes.h"
 #include "aestst.h"
-#include "aesaux.h"
+//#include "aesaux.h"
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
@@ -52,6 +52,72 @@ typedef enum { L_bad = -1, L_count = 0, L_key, L_iv, L_plaintext, L_ciphertext }
 char *hdr_str[] = { "COUNT = ", "KEY = ", "IV = ", "PLAINTEXT = ", "CIPHERTEXT = " };
 
 char *test_path = "..\\testvals\\fax\\";
+char *hxx = "0123456789abcdef";
+
+int to_hex(int ch)
+{
+    return (ch & 15) + (ch >= '0' && ch <= '9' ? 0 : 9);
+}
+
+int get_dec(const char *s)
+{   const char  *p = s;
+    int nbr = 0;
+
+    while(*p && *p >= '0' && *p <= '9')
+    {
+        nbr = 10 * nbr + (*p - '0'); ++p;
+    }
+
+    return nbr;
+}
+
+int get_line(FILE *inf, char s[])
+{
+    if(feof(inf))
+        return EXIT_FAILURE;
+    return fgets(s, INPUT_BUF_SIZE, inf) == s ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+int block_in(unsigned char l[], const char *p)
+{   int i = 0;
+
+    while(*p && *(p + 1) && isxdigit(*p) && isxdigit(*(p + 1)))
+    {
+        l[i++] = (to_hex(*p) << 4) + to_hex(*(p + 1)); p += 2;
+    }
+    return i;
+}
+
+int find_string(const char *s1, const char s2[])
+{   const char  *p1 = s1, *q1, *q2;
+
+    while(*p1)
+    {
+        q1 = p1; q2 = s2;
+
+        while(*q1 && *q2 && *q1 == *q2)
+        {
+            q1++; q2++;
+        }
+
+        if(!*q2)
+            return (int)(p1 - s1);
+        p1++;
+    }
+    return -1;
+}
+
+enum line_type find_line2(FILE *inf, char str[], char **p)
+{   int i;
+
+    for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
+        if(find_string(str, hdr_str[i]) >= 0)
+        {
+            *p = str + strlen(hdr_str[i]);
+            return (line_type)i;
+        }
+    return L_bad;
+}
 
 void do_encrypt(mode mm, const unsigned char key[], unsigned char iv[], 
                 const unsigned char pt[], unsigned char ct[], int key_len, int block_len)
@@ -182,7 +248,7 @@ void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void run_aes_avs_test(mode mm, type tt)
-{   char  path[128], inbuf[1024], *p;
+{   char  path[128], inbuf[1024], *p = inbuf;
     unsigned char key[2 * BLOCK_SIZE], iv[BLOCK_SIZE], pt[MAX_TEXT_SIZE], ct[MAX_TEXT_SIZE], rt[MAX_TEXT_SIZE];
     int i, err, cnt, key_len, iv_len, pt_len, ct_len;
     FILE *f;
@@ -203,7 +269,7 @@ void run_aes_avs_test(mode mm, type tt)
         }
         while(get_line(f, inbuf) == EXIT_SUCCESS)
         {
-            if((ty = find_line(f, inbuf)) != L_bad)
+            if((ty = find_line2(f, inbuf, p)) != L_bad)
                 switch(ty)
                 {
                 case L_count:

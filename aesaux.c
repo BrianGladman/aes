@@ -244,7 +244,7 @@ void put_dec(char *s, unsigned long val)
 
 unsigned long get_dec(const char *s)
 {   const char  *p = pos(s);
-    unsigned long        nbr = 0;
+    unsigned long nbr = 0;
 
     while(*p && *p >= '0' && *p <= '9')
     {

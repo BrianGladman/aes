@@ -259,7 +259,11 @@ void run_aes_avs_test(mode mm, type tt)
                     }
                     break;
                 }
-
+                if(err > 5)                  
+                {
+                    printf("\nAborted - too many error on file %s", path);
+                    break;
+                }
             }
         }
         fclose(f);

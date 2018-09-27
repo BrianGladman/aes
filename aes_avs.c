@@ -28,7 +28,7 @@ Issue Date: 26/09/2018
 
 #include "aes.h"
 #include "aestst.h"
-//#include "aesaux.h"
+#include "aesaux.h"
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
@@ -79,20 +79,20 @@ void do_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
                 const unsigned char pt[], unsigned char ct[], int key_len, int block_len)
 {   aes_encrypt_ctx ctx[1];
 
-    f_enc_key(key, key_len, ctx);
+    f_enc_key(ctx, key, key_len);
     switch(mm)
     {
     case ECB:
-        f_ecb_enc(pt, ct, block_len, ctx);
+        f_ecb_enc(ctx, pt, ct, block_len);
         break;
     case CBC:
-        f_cbc_enc(pt, ct, block_len, iv, ctx);
+        f_cbc_enc(ctx, pt, ct, block_len, iv);
         break;
     case CFB:
-        f_cfb_enc(pt, ct, block_len, iv, ctx);
+        f_cfb_enc(ctx, pt, ct, block_len, iv);
         break;
     case OFB:
-        f_ofb_cry(pt, ct, block_len, iv, ctx);
+        f_ofb_cry(ctx, pt, ct, block_len, iv);
         break;
     }
 }
@@ -104,20 +104,20 @@ void do_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
     switch(mm)
     {
     case ECB:
-        f_dec_key(key, key_len, ctx);
-        f_ecb_dec(ct, pt, block_len, ctx);
+        f_dec_key(ctx, key, key_len);
+        f_ecb_dec(ctx, ct, pt, block_len);
         break;
     case CBC:
-        f_dec_key(key, key_len, ctx);
-        f_cbc_dec(ct, pt, block_len, iv, ctx);
+        f_dec_key(ctx, key, key_len);
+        f_cbc_dec(ctx, ct, pt, block_len, iv);
         break;
     case CFB:
-        f_enc_key(key, key_len, (aes_encrypt_ctx*)ctx);
-        f_cfb_dec(ct, pt, block_len, iv, (aes_encrypt_ctx*)ctx);
+        f_enc_key((aes_encrypt_ctx*)ctx, key, key_len);
+        f_cfb_dec((aes_encrypt_ctx*)ctx, ct, pt, block_len, iv);
         break;
     case OFB:
-        f_enc_key(key, key_len, (aes_encrypt_ctx*)ctx);
-        f_ofb_cry(ct, pt, block_len, iv, (aes_encrypt_ctx*)ctx);
+        f_enc_key((aes_encrypt_ctx*)ctx, key, key_len);
+        f_ofb_cry((aes_encrypt_ctx*)ctx, ct, pt, block_len, iv);
         break;
     }
 }
@@ -128,13 +128,13 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
     unsigned char tmp[BLOCK_SIZE];
     int i;
 
-    f_enc_key(key, key_len, ctx);
+    f_enc_key(ctx, key, key_len);
     if(mm == ECB)
     {
         for(i = 0; i < MCT_REPEAT / 2; ++i)
         {
-            f_ecb_enc(pt, ct, BLOCK_SIZE, ctx);
-            f_ecb_enc(ct, pt, BLOCK_SIZE, ctx);
+            f_ecb_enc(ctx, pt, ct, BLOCK_SIZE);
+            f_ecb_enc(ctx, ct, pt, BLOCK_SIZE);
         }
         memcpy(ct, pt, BLOCK_SIZE);
     }
@@ -146,13 +146,13 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
             switch(mm)
             {
             case 1:
-                f_cbc_enc(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_cbc_enc(ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             case 2:
-                f_cfb_enc(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_cfb_enc(ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             case 3:
-                f_ofb_cry(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_ofb_cry(ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             }
             memcpy(pt, tmp, BLOCK_SIZE);
@@ -162,40 +162,40 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
-                    const unsigned char ct[], unsigned char pt[], int key_len, int block_len)
+                    unsigned char ct[], unsigned char pt[], int key_len, int block_len)
 {   aes_decrypt_ctx ctx[1];
     unsigned char tmp[BLOCK_SIZE], tmp2[BLOCK_SIZE];
     int i;
     if(mm == ECB)
     {
-        f_dec_key(key, key_len, ctx);
+        f_dec_key(ctx, key, key_len);
         memcpy(tmp, ct, BLOCK_SIZE);
         for(i = 0; i < MCT_REPEAT / 2; ++i)
         {
-            f_ecb_dec(ct, pt, BLOCK_SIZE, ctx);
-            f_ecb_dec(pt, ct, BLOCK_SIZE, ctx);
+            f_ecb_dec(ctx, ct, pt, BLOCK_SIZE);
+            f_ecb_dec(ctx, pt, ct, BLOCK_SIZE);
         }
         memcpy(pt, ct, BLOCK_SIZE);
     }
     else
     {
         if(mm == CBC)
-            f_dec_key(key, key_len, ctx);
+            f_dec_key(ctx, key, key_len);
         else
-            f_enc_key(key, key_len, (aes_encrypt_ctx*)ctx);
+            f_enc_key((aes_encrypt_ctx*)ctx, key, key_len);
         memcpy(tmp, iv, BLOCK_SIZE);
         for(i = 0; i < MCT_REPEAT; ++i)
         {
             switch(mm)
             {
             case 1:
-                f_cbc_dec(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_cbc_dec(ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             case 2:
-                f_cfb_dec(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_cfb_dec((aes_encrypt_ctx*)ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             case 3:
-                f_ofb_cry(pt, ct, BLOCK_SIZE, iv, ctx);
+                f_ofb_cry((aes_encrypt_ctx*)ctx, pt, ct, BLOCK_SIZE, iv);
                 break;
             }
             memcpy(ct, tmp, BLOCK_SIZE);
@@ -227,7 +227,7 @@ void run_aes_avs_test(mode mm, type tt)
         }
         while(get_line(f, inbuf) == EXIT_SUCCESS)
         {
-            if((ty = find_line2(inbuf, p)) != L_bad)
+            if((ty = find_line2(inbuf, &p)) != L_bad)
                 switch(ty)
                 {
                 case L_count:

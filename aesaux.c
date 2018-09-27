@@ -87,12 +87,12 @@ int to_hex(int ch)
     return (ch & 15) + (ch >= '0' && ch <= '9' ? 0 : 9);
 }
 
-int get_line(FILE *inf, char s[])
+int get_line(FILE *inf, char s[], int max_len)
 {
     if(feof(inf))
         return EXIT_FAILURE;
 
-    return fgets(s, 100, inf) != s ? EXIT_FAILURE : EXIT_SUCCESS;
+    return fgets(s, max_len, inf) != s ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 char *copy_str(char *d, const char *s)
@@ -337,7 +337,7 @@ int find_string(const char *s1, const char s2[])
 enum line_type find_line(FILE *inf, char str[])
 {   int i;
 
-    while(get_line(inf, str) == EXIT_SUCCESS)   // input a line
+    while(get_line(inf, str, 128) == EXIT_SUCCESS)   // input a line
     {
         for(i = 1; i < NO_LTYPES; ++i)  // compare line header
         {

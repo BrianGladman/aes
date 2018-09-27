@@ -49,7 +49,7 @@ enum line_type { bad_line = 0, block_len, key_len, test_no, iv_val, key_val, pt_
 char *file_name(char* buf, size_t len, const unsigned long type, const unsigned long blen, const unsigned long klen);
 const char *pos(const char *s);
 int to_hex(int ch);
-int get_line(FILE *inf, char s[]);
+int get_line(FILE *inf, char s[], int max_len);
 char *copy_str(char *s, const char *fstr);
 const char *df_string(const char *p);
 int block_in(unsigned char l[], const char *p);

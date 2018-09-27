@@ -53,13 +53,12 @@ char *hdr_str[] = { "COUNT = ", "KEY = ", "IV = ", "PLAINTEXT = ", "CIPHERTEXT =
 
 char *test_path = "..\\testvals\\avs\\";
 
-enum line_type find_line2(char str[], char **p)
+enum line_type find_line2(char str[])
 {   int i;
 
     for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
         if(find_string(str, hdr_str[i]) >= 0)
         {
-            *p = str + strlen(hdr_str[i]);
             return (line_type)i;
         }
     return L_bad;
@@ -196,7 +195,7 @@ void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
 
 void run_aes_avs_test(mode mm, type tt)
 {
-    char  path[128], inbuf[1024], *p = inbuf, *pp;
+    char  path[128], inbuf[1024];
     unsigned char key[2 * BLOCK_SIZE], iv[BLOCK_SIZE], pt[MAX_TEXT_SIZE], ct[MAX_TEXT_SIZE], rt[MAX_TEXT_SIZE];
     int i, err, cnt, key_len, iv_len, pt_len, ct_len;
     FILE *f;
@@ -217,22 +216,22 @@ void run_aes_avs_test(mode mm, type tt)
         }
         while(get_line(f, inbuf, 1024) == EXIT_SUCCESS)
         {
-            if((ty = find_line2(inbuf, &pp)) != L_bad)
+            if((ty = find_line2(inbuf)) != L_bad)
             {
                 switch(ty)
                 {
                 case L_count:
                     key_len = iv_len = pt_len = ct_len = 0;
-                    cnt = get_dec(p);
+                    cnt = get_dec(inbuf);
                     break;
                 case L_key:
-                    key_len = block_in(key, p);
+                    key_len = block_in(key, inbuf);
                     break;
                 case L_iv:
-                    iv_len = block_in(iv, p);
+                    iv_len = block_in(iv, inbuf);
                     break;
                 case L_plaintext:
-                    pt_len = block_in(pt, p);
+                    pt_len = block_in(pt, inbuf);
                     if(pt_len == ct_len)
                     {
                         if(tt != MCT)
@@ -246,7 +245,7 @@ void run_aes_avs_test(mode mm, type tt)
                     }
                     break;
                 case L_ciphertext:
-                    ct_len = block_in(ct, p);
+                    ct_len = block_in(ct, inbuf);
                     if(ct_len == pt_len)
                     {
                         if(tt == MCT)

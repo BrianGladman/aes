@@ -51,25 +51,14 @@ char *klen_str[] = { "128",  "192",  "256" };
 typedef enum { L_bad = -1, L_count = 0, L_key, L_iv, L_plaintext, L_ciphertext } line_type;
 char *hdr_str[] = { "COUNT = ", "KEY = ", "IV = ", "PLAINTEXT = ", "CIPHERTEXT = " };
 
-char *test_path = "..\\testvals\\fax\\";
+char *test_path = "..\\testvals\\avs\\";
 
-int block_in2(unsigned char l[], const char *p)
-{   int i = 0;
-
-    while(*p && *(p + 1) && isxdigit(*p) && isxdigit(*(p + 1)))
-    {
-        l[i++] = (to_hex(*p) << 4) + to_hex(*(p + 1)); p += 2;
-    }
-    return i;
-}
-
-enum line_type find_line2(char str[], char **p)
+enum line_type find_line2(char str[])
 {   int i;
 
     for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
         if(find_string(str, hdr_str[i]) >= 0)
         {
-            *p = str + strlen(hdr_str[i]);
             return (line_type)i;
         }
     return L_bad;
@@ -164,7 +153,7 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
 void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
                     unsigned char ct[], unsigned char pt[], int key_len, int block_len)
 {   aes_decrypt_ctx ctx[1];
-    unsigned char tmp[BLOCK_SIZE], tmp2[BLOCK_SIZE];
+    unsigned char tmp[BLOCK_SIZE];
     int i;
     if(mm == ECB)
     {
@@ -189,13 +178,13 @@ void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
             switch(mm)
             {
             case 1:
-                f_cbc_dec(ctx, pt, ct, BLOCK_SIZE, iv);
+                f_cbc_dec(ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             case 2:
-                f_cfb_dec((aes_encrypt_ctx*)ctx, pt, ct, BLOCK_SIZE, iv);
+                f_cfb_dec(ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             case 3:
-                f_ofb_cry((aes_encrypt_ctx*)ctx, pt, ct, BLOCK_SIZE, iv);
+                f_ofb_cry(ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             }
             memcpy(ct, tmp, BLOCK_SIZE);
@@ -206,7 +195,7 @@ void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
 
 void run_aes_avs_test(mode mm, type tt)
 {
-    char  path[128], inbuf[1024], *p = inbuf;
+    char  path[128], inbuf[1024];
     unsigned char key[2 * BLOCK_SIZE], iv[BLOCK_SIZE], pt[MAX_TEXT_SIZE], ct[MAX_TEXT_SIZE], rt[MAX_TEXT_SIZE];
     int i, err, cnt, key_len, iv_len, pt_len, ct_len;
     FILE *f;
@@ -219,58 +208,59 @@ void run_aes_avs_test(mode mm, type tt)
         strcat(path, mode_str[mm]);
         strcat(path, type_str[tt]);
         strcat(path, klen_str[i]);
-        strcat(path, ".fax");
+        strcat(path, ".rsp");
         if(fopen_s(&f, path, "r"))
         {
             printf("\nUnable to open %s for reading", path);
             return;
         }
-        while(get_line(f, inbuf) == EXIT_SUCCESS)
+        while(get_line(f, inbuf, 1024) == EXIT_SUCCESS)
         {
-            if((ty = find_line2(inbuf, &p)) != L_bad)
+            if((ty = find_line2(inbuf)) != L_bad)
+            {
                 switch(ty)
                 {
                 case L_count:
                     key_len = iv_len = pt_len = ct_len = 0;
-                    cnt = get_dec(p);
+                    cnt = get_dec(inbuf);
                     break;
                 case L_key:
-                    key_len = block_in2(key, p);
+                    key_len = block_in(key, inbuf);
                     break;
                 case L_iv:
-                    iv_len = block_in2(iv, p);
+                    iv_len = block_in(iv, inbuf);
                     break;
                 case L_plaintext:
-                    pt_len = block_in2(pt, p);
+                    pt_len = block_in(pt, inbuf);
                     if(pt_len == ct_len)
                     {
                         if(tt != MCT)
                             do_decrypt(mm, key, iv, ct, rt, key_len, pt_len);
                         else
                             do_mct_decrypt(mm, key, iv, ct, rt, key_len, pt_len);
-                        if(memcmp(pt, rt, pt_len))
-                        {
+                        if(memcmp(pt, rt, pt_len)){
                             printf("\nError on file %s, on test %i", path, cnt);
                             ++err;
                         }
                     }
                     break;
                 case L_ciphertext:
-                    ct_len = block_in2(ct, p);
+                    ct_len = block_in(ct, inbuf);
                     if(ct_len == pt_len)
                     {
                         if(tt == MCT)
                             do_mct_encrypt(mm, key, iv, pt, rt, key_len, pt_len);
                         else
                             do_encrypt(mm, key, iv, pt, rt, key_len, pt_len);
-                        if(memcmp(ct, rt, pt_len))
-                        {
+                        if(memcmp(ct, rt, pt_len)){
                             printf("\nError on file %s, on test %i", path, cnt);
                             ++err;
                         }
                     }
                     break;
                 }
+
+            }
         }
         fclose(f);
         if(!err)

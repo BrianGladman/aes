@@ -28,7 +28,9 @@ Issue Date: 26/09/2018
 
 #include "aes.h"
 #include "aestst.h"
-//#include "aesaux.h"
+#if defined( __GNUC__ )
+#  include "aesaux.h"
+#endif
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
@@ -151,7 +153,7 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
-                    const unsigned char ct[], unsigned char pt[], int key_len, int block_len)
+                    unsigned char ct[], unsigned char pt[], int key_len, int block_len)
 {   aes_decrypt_ctx ctx[1];
     unsigned char tmp[BLOCK_SIZE];
     int i;
@@ -181,10 +183,10 @@ void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
                 f_cbc_dec(ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             case 2:
-                f_cfb_dec(ctx, ct, pt, BLOCK_SIZE, iv);
+                f_cfb_dec((aes_encrypt_ctx*)ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             case 3:
-                f_ofb_cry(ctx, ct, pt, BLOCK_SIZE, iv);
+                f_ofb_cry((aes_encrypt_ctx*)ctx, ct, pt, BLOCK_SIZE, iv);
                 break;
             }
             memcpy(ct, tmp, BLOCK_SIZE);

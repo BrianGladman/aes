@@ -28,7 +28,7 @@ Issue Date: 26/09/2018
 
 #include "aes.h"
 #include "aestst.h"
-//#include "aesaux.h"
+#include "aesaux.h"
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;

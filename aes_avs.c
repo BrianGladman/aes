@@ -28,7 +28,7 @@ Issue Date: 26/09/2018
 
 #include "aes.h"
 #include "aestst.h"
-//#include "aesaux.h"
+#include "aesaux.h"
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
 fn_ptrs fn;
@@ -151,7 +151,7 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
-                    const unsigned char ct[], unsigned char pt[], int key_len, int block_len)
+                    unsigned char ct[], unsigned char pt[], int key_len, int block_len)
 {   aes_decrypt_ctx ctx[1];
     unsigned char tmp[BLOCK_SIZE];
     int i;

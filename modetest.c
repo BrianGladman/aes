@@ -22,6 +22,9 @@ Issue Date: 20/12/2007
 
 #if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD ))
 #include <windows.h>
+#elif defined(__GNUC__)
+#  define _GNU_SOURCE
+#  include <sched.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -1266,6 +1269,13 @@ int main(void)
     else
     {
         printf("Couldn't get Process Affinity Mask\n\n"); return -1;
+    }
+#elif defined( DUAL_CORE ) && defined( __GNUC__ )
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    CPU_SET(0, &cpu_set);
+    if(sched_setaffinity(0, sizeof(cpu_set_t), &cpu_set) == -1){
+        perror("Unable to set CPU affinity mask"); return -1;
     }
 #endif
 

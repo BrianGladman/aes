@@ -22,6 +22,9 @@ Issue Date: 20/12/2007
 
 #if defined( _MSC_VER ) && (defined( DUAL_CORE ) || defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD ))
 #include <windows.h>
+#elif defined(__GNUC__)
+#  define _GNU_SOURCE
+#  include <sched.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -1267,6 +1270,13 @@ int main(void)
     {
         printf("Couldn't get Process Affinity Mask\n\n"); return -1;
     }
+#elif defined( DUAL_CORE ) && defined( __GNUC__ )
+    cpu_set_t cpu_set;
+    CPU_ZERO(&cpu_set);
+    CPU_SET(0, &cpu_set);
+    if(sched_setaffinity(0, sizeof(cpu_set_t), &cpu_set) == -1){
+        perror("Unable to set CPU affinity mask"); return -1;
+    }
 #endif
 
 #if defined( DLL_IMPORT ) && defined( DLL_DYNAMIC_LOAD )
@@ -1304,7 +1314,7 @@ int main(void)
             memcpy(buf2, buf1, BUFLEN);
             memcpy(buf3, buf1, BUFLEN);
 
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
 
@@ -1349,7 +1359,7 @@ int main(void)
             memcpy(buf2, buf1, BUFLEN);
             memcpy(buf3, buf1, BUFLEN);
 
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
 
@@ -1412,9 +1422,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1435,7 +1445,7 @@ int main(void)
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
             CFBdec(buf2, len, iv2, ecx1);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len2 = AES_BLOCK_SIZE * (len2 / AES_BLOCK_SIZE);
@@ -1489,9 +1499,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1512,7 +1522,7 @@ int main(void)
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
             OFBdec(buf2, len, iv2, ecx1);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len2 = AES_BLOCK_SIZE * (len2 / AES_BLOCK_SIZE);
@@ -1566,9 +1576,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1588,7 +1598,7 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
             CTRcry(buf2, len, iv2, ctr_inc, ecx1);
 #ifdef WHOLE_BLOCKS

@@ -465,6 +465,8 @@ void do_tests(int do_cmp, int ttype[3], f_ectx alg[1], const unsigned long blen,
 
                 if(do_cmp)  // compare it with reference if required
                     comp_vecs(name2, name1);
+            } else {
+                printf("ERROR: failed to open %s for writing\n", name1);
             }
        }
 }

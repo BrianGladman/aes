@@ -1304,7 +1304,7 @@ int main(void)
             memcpy(buf2, buf1, BUFLEN);
             memcpy(buf3, buf1, BUFLEN);
 
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
 
@@ -1349,7 +1349,7 @@ int main(void)
             memcpy(buf2, buf1, BUFLEN);
             memcpy(buf3, buf1, BUFLEN);
 
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
 
@@ -1412,9 +1412,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1435,7 +1435,7 @@ int main(void)
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
             CFBdec(buf2, len, iv2, ecx1);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len2 = AES_BLOCK_SIZE * (len2 / AES_BLOCK_SIZE);
@@ -1489,9 +1489,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1512,7 +1512,7 @@ int main(void)
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
             OFBdec(buf2, len, iv2, ecx1);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len2 = AES_BLOCK_SIZE * (len2 / AES_BLOCK_SIZE);
@@ -1566,9 +1566,9 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len = (unsigned int)(0.5 * BUFLEN * (1.0 + td));
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
 #ifdef WHOLE_BLOCKS
             len = AES_BLOCK_SIZE * (len / AES_BLOCK_SIZE);
@@ -1588,7 +1588,7 @@ int main(void)
 
             f_info(ecx1) = 0;
             f_mode_reset(ecx2);
-            td = rand32() / (65536.0 * 65536.0);
+            td = rand32() / ((double)UINT32_MAX);
             len2 = (unsigned int)(td * len);
             CTRcry(buf2, len, iv2, ctr_inc, ecx1);
 #ifdef WHOLE_BLOCKS

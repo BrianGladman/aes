@@ -190,13 +190,13 @@ int block_cmp(const unsigned char l[], const unsigned char r[], const unsigned l
     return EXIT_SUCCESS;
 }
 
-unsigned long rand32(void)
-{   static unsigned long   r4,r_cnt = (unsigned long)-1, w = 521288629, z = 362436069;
+uint32_t rand32(void)
+{   static uint32_t r4, w = 521288629, z = 362436069;
 
     z = 36969 * (z & 65535) + (z >> 16);
     w = 18000 * (w & 65535) + (w >> 16);
 
-    r_cnt = 0; r4 = (z << 16) + w; return r4;
+    r4 = (z << 16) + w; return r4;
 }
 
 unsigned char rand8(void)
@@ -207,7 +207,7 @@ unsigned char rand8(void)
         r4 = rand32(); r_cnt = 0;
     }
 
-    return (char)(r4 >> (8 * r_cnt++));
+    return (unsigned char)(r4 >> (8 * r_cnt++));
 }
 
 // fill a block with random characters

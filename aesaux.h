@@ -26,6 +26,7 @@ Issue Date: 25/09/2018
 #include <ctype.h>
 
 #include "aestst.h"
+#include "brg_types.h"
 
 #if defined(__cplusplus)
 extern "C"
@@ -58,7 +59,7 @@ void block_reverse(unsigned char l[], const unsigned long len);
 void block_copy(unsigned char l[], const unsigned char r[], const unsigned long len);
 void block_xor(unsigned char l[], const unsigned char r[], const unsigned long len);
 int block_cmp(const unsigned char l[], const unsigned char r[], const unsigned long len);
-unsigned long rand32(void);
+uint32_t rand32(void);
 unsigned char rand8(void);
 void block_rndfill(unsigned char l[], unsigned long len);
 void put_dec(char *s, unsigned long val);

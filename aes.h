@@ -94,12 +94,10 @@ typedef union
 typedef struct ALIGNED_(16)
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
-} aes_encrypt_ctx;
+} aes_crypt_ctx;
 
-typedef struct ALIGNED_(16)
-{   uint32_t ks[KS_LENGTH];
-    aes_inf inf;
-} aes_decrypt_ctx;
+typedef aes_crypt_ctx aes_encrypt_ctx;
+typedef aes_crypt_ctx aes_decrypt_ctx;
 
 #ifdef _MSC_VER
 #  pragma warning( default : 4324 )

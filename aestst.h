@@ -72,19 +72,13 @@ typedef AES_RETURN g_dec_blk(const unsigned char*, unsigned char*, const aes_dec
 
 typedef AES_RETURN g_talign(unsigned int n);
 typedef AES_RETURN g_reset(const aes_encrypt_ctx[1]);
-typedef AES_RETURN g_enc1(const unsigned char*, unsigned char*, int,
-                                            const aes_encrypt_ctx[1]);
-typedef AES_RETURN g_dec1(const unsigned char*, unsigned char*, int,
-                                            const aes_decrypt_ctx[1]);
-typedef AES_RETURN g_enc2(const unsigned char*, unsigned char*, int,
-                            unsigned char*, const aes_encrypt_ctx[1]);
-typedef AES_RETURN g_dec2(const unsigned char*, unsigned char*, int,
-                            unsigned char*, const aes_decrypt_ctx[1]);
-typedef AES_RETURN g_enc3(const unsigned char*, unsigned char*, int,
-                                  unsigned char*, aes_encrypt_ctx[1]);
-typedef void cif(unsigned char*);
-typedef AES_RETURN g_enc4(const unsigned char*, unsigned char*, int,
-                        unsigned char*, cif, aes_encrypt_ctx[1]);
+typedef AES_RETURN g_enc1(const unsigned char*, unsigned char*, int, const aes_encrypt_ctx[1]);
+typedef AES_RETURN g_dec1(const unsigned char*, unsigned char*, int, const aes_decrypt_ctx[1]);
+typedef AES_RETURN g_enc2(const unsigned char*, unsigned char*, int, unsigned char*, const aes_encrypt_ctx[1]);
+typedef AES_RETURN g_dec2(const unsigned char*, unsigned char*, int, unsigned char*, const aes_decrypt_ctx[1]);
+typedef AES_RETURN g_enc3(const unsigned char*, unsigned char*, int, unsigned char*, aes_encrypt_ctx[1]);
+typedef void (*cif)(unsigned char*);
+typedef AES_RETURN g_enc4(const unsigned char*, unsigned char*, int, unsigned char*, cif, aes_encrypt_ctx[1]);
 
 typedef struct  // initialised with subroutine addresses when the DLL is loaded
 {

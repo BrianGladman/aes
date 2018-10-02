@@ -15,7 +15,7 @@ This software is provided 'as is' with no explicit or implied warranties
 in respect of its operation, including, but not limited to, correctness
 and fitness for purpose.
 ---------------------------------------------------------------------------
-Issue Date: 02/08/2018
+Issue Date: 02/09/2018
 
  This file contains the definitions required to use AES in C. See aesopt.h
  for optimisation details.
@@ -94,12 +94,10 @@ typedef union
 typedef struct ALIGNED_(16)
 {   uint32_t ks[KS_LENGTH];
     aes_inf inf;
-} aes_encrypt_ctx;
+} aes_crypt_ctx;
 
-typedef struct ALIGNED_(16)
-{   uint32_t ks[KS_LENGTH];
-    aes_inf inf;
-} aes_decrypt_ctx;
+typedef aes_crypt_ctx aes_encrypt_ctx;
+typedef aes_crypt_ctx aes_decrypt_ctx;
 
 #ifdef _MSC_VER
 #  pragma warning( default : 4324 )

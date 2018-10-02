@@ -112,7 +112,7 @@ void do_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
-                    unsigned char pt[], unsigned char ct[], int key_len, int block_len)
+                    unsigned char pt[], unsigned char ct[], int key_len)
 {   aes_encrypt_ctx ctx[1];
     unsigned char tmp[BLOCK_SIZE];
     int i;
@@ -151,7 +151,7 @@ void do_mct_encrypt(mode mm, const unsigned char key[], unsigned char iv[],
 }
 
 void do_mct_decrypt(mode mm, const unsigned char key[], unsigned char iv[],
-                    unsigned char ct[], unsigned char pt[], int key_len, int block_len)
+                    unsigned char ct[], unsigned char pt[], int key_len)
 {   aes_decrypt_ctx ctx[1];
     unsigned char tmp[BLOCK_SIZE];
     int i;
@@ -234,10 +234,10 @@ void run_aes_avs_test(mode mm, type tt)
                     pt_len = block_in(pt, inbuf);
                     if(pt_len == ct_len)
                     {
-                        if(tt != MCT)
-                            do_decrypt(mm, key, iv, ct, rt, key_len, pt_len);
+                        if(tt == MCT)
+                            do_mct_decrypt(mm, key, iv, ct, rt, key_len);
                         else
-                            do_mct_decrypt(mm, key, iv, ct, rt, key_len, pt_len);
+                            do_decrypt(mm, key, iv, ct, rt, key_len, pt_len);
                         if(memcmp(pt, rt, pt_len)){
                             printf("\nError on file %s, on test %i", path, cnt);
                             ++err;
@@ -249,7 +249,7 @@ void run_aes_avs_test(mode mm, type tt)
                     if(ct_len == pt_len)
                     {
                         if(tt == MCT)
-                            do_mct_encrypt(mm, key, iv, pt, rt, key_len, pt_len);
+                            do_mct_encrypt(mm, key, iv, pt, rt, key_len);
                         else
                             do_encrypt(mm, key, iv, pt, rt, key_len, pt_len);
                         if(memcmp(ct, rt, pt_len)){
@@ -277,13 +277,15 @@ int main(void)
 
 #if defined( DLL_IMPORT ) && defined(  DLL_DYNAMIC_LOAD  )
     HINSTANCE   h_dll;
+    printf("Testing with the AES DLL (with dynamic loading)");
     if(!(h_dll = init_dll(&fn)))
            return -1;
 #else
+    printf("Testing with the AES static Linbrary");
     aes_init();
 #endif
 
-for( i = 0 ; i < 4 ; ++i )
+    for( i = 0 ; i < 4 ; ++i )
         for( j = 0 ; j < 6 ; ++j)
             run_aes_avs_test((mode)i, (type)j);
 

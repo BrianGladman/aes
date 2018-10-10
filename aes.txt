@@ -245,7 +245,7 @@ environments
 		                (+ aes_ni.h for AES_NI)
         C source:       aes_modes.c (+ aes_ni.c for AES_NI)
         x86 assembler:  aes_amd64.asm
-        defines         ASM_X86_V2 (set for C and assembler files)
+        defines         ASM_AMD64_C (set for C and assembler files)
     
 	dll_asm_amd64_c     x64
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h

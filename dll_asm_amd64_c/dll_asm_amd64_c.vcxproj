@@ -58,7 +58,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DLL_EXPORT;ASM_AMD64_C;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DLL_EXPORT;ASM_AMD64_C;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -97,7 +97,7 @@ copy "$(TargetDir)$(TargetName).pdb" "$(TargetDir)aes.pdb"
     </Midl>
     <ClCompile>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DLL_EXPORT;ASM_AMD64_C;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;DLL_EXPORT;ASM_AMD64_C;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

@@ -44,7 +44,10 @@
 ; used if __GNUC__ is defined.
 ;
 ; Define _SEH_ to include support for Win64 structured exception handling
-; (this requires YASM version 0.6 or later).
+; (this requires YASM version 0.6 or later).  
+;
+; In order to use this code in Windows kernel mode, set the NO_PAGING define
+; to disable structured exception handling and paging.
 ;
 ; This code provides the standard AES block size (128 bits, 16 bytes) and the
 ; three standard AES key sizes (128, 192 and 256 bits). It has the same call
@@ -74,9 +77,18 @@
 ; either bits or bytes.
 
 ;----------------------------------------------------------------------------
+
+; Use of this assembler code in Windows kernel mode requires structured
+; exception handling and memory paging to be disabled
+%ifdef NO_PAGING
+%undef _SEH_
+%define set_page nopage
+%else
+%define set_page
+%endif
+
 ; Comment in/out the following lines to obtain the desired subroutines. These
 ; selections MUST match those in the C header files aes.h and aesopt.h
-
 %ifdef INTEL_AES_POSSIBLE
 %define USE_INTEL_AES_IF_PRESENT
 %endif
@@ -681,7 +693,7 @@
     export  aes_ni(encrypt)
 %endif
 
-    section .data align=64
+    section .data align=64 set_page
     align   64
 enc_tab:
     enc_vals u8
@@ -689,7 +701,7 @@ enc_tab:
     enc_vals w8
 %endif
 
-    section .text align=16
+    section .text align=16 set_page
     align   16
 
 %ifdef _SEH_

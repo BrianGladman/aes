@@ -15,7 +15,7 @@
 ; in respect of its operation, including, but not limited to, correctness
 ; and fitness for purpose.
 ; ---------------------------------------------------------------------------
-; Issue Date: 20/12/2007
+; Issue Date: 27/10/2018
 ;
 ; I am grateful to Dag Arne Osvik for many discussions of the techniques that
 ; can be used to optimise AES assembler code on AMD64/EM64T architectures.

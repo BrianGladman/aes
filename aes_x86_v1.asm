@@ -60,7 +60,15 @@
 ;
 ; where <NNN> is 128, 102 or 256.  In the last two calls the length can be in
 ; either bits or bytes.
-;
+
+; Use of this assembler code in Windows kernel mode requires memory paging 
+; to be disabled
+%ifdef NO_PAGING
+%define set_page nopage
+%else
+%define set_page
+%endif
+
 ; Comment in/out the following lines to obtain the desired subroutines. These
 ; selections MUST match those in the C header file aes.h
 
@@ -346,7 +354,7 @@ stk_spc equ    20   ; stack space
 
 %endmacro
 
-    section .text align=32
+    section .text align=32 set_page
 
 ; AES Encryption Subroutine
 
@@ -557,7 +565,7 @@ stk_spc equ    20   ; stack space
 
 %endmacro
 
-    section .text align=32
+    section .text align=32 set_page
 
 ; AES Decryption Subroutine
 

@@ -134,6 +134,8 @@ stk_spc equ    20   ; stack space
 
 ; End of user defines
 
+    section .text align=32 set_page
+
 %ifdef AES_VAR
 %ifndef AES_128
 %define AES_128
@@ -354,8 +356,6 @@ stk_spc equ    20   ; stack space
 
 %endmacro
 
-    section .text align=32 set_page
-
 ; AES Encryption Subroutine
 
     align   32
@@ -564,8 +564,6 @@ stk_spc equ    20   ; stack space
     xor     ebx,[ebp+4]
 
 %endmacro
-
-    section .text align=32 set_page
 
 ; AES Decryption Subroutine
 

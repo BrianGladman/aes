@@ -459,7 +459,7 @@ enc_round:
 %endmacro
 
 ;   AES Encryption Subroutine
-
+    align   32
     do_name _aes_encrypt,12
     push    ebp
     push    ebx
@@ -874,7 +874,7 @@ enc_round:
 
 %ifdef REDUCE_CODE_SIZE
 
-    section .text align=32 set_page
+	align 32
 dec_round:
 	_dec_round
 	ret
@@ -906,7 +906,7 @@ dec_round:
 %endmacro
 
 ; AES Decryption Subroutine
-
+    align   32
     do_name _aes_decrypt,12
     push    ebp
     push    ebx
@@ -1307,7 +1307,7 @@ dec_end:
 
 %endif
 
-    section .data align=32
+    section .data align=32 set_page
 
 %ifdef ENCRYPTION_TABLE
 

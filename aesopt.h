@@ -336,7 +336,7 @@ Issue Date: 20/12/2007
     The internal state of Rijndael is stored in a number of local 32-bit
     word variables which can be defined either as an array or as individual
     names variables. Include this section if you want to store these local
-    varaibles in arrays. Otherwise individual local variables will be used.
+    variables in arrays. Otherwise individual local variables will be used.
 */
 #if 1
 #  define ARRAYS

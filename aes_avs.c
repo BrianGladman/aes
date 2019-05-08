@@ -281,7 +281,7 @@ int main(void)
     if(!(h_dll = init_dll(&fn)))
            return -1;
 #else
-    printf("Testing with the AES static Linbrary");
+    printf("Testing with the AES static Library");
     aes_init();
 #endif
 

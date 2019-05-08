@@ -612,7 +612,7 @@ Please note the following IMPORTANT points about the AES mode subroutines:
        
     7. CFB, OFB and CTR modes only use AES encryption 
        operations and contexts and do not need AES
-       decrytpion operations.
+       decryption operations.
        
     8. AES keys remain valid across resets and changes
        of mode (but encryption and decryption keys must 

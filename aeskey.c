@@ -37,6 +37,13 @@ extern "C"
 {
 #endif
 
+/* Use the low bit in the context's inf.b[2] as a flag to
+   indicate whether a context was initialized for encryption
+   or decryption.
+*/
+#define MARK_AS_ENCRYPTION_CTX(cx) (cx)->inf.b[2] |= (uint8_t)0x01
+#define MARK_AS_DECRYPTION_CTX(cx) (cx)->inf.b[2] &= (uint8_t)0xfe
+
 /* Initialise the key schedule from the user supplied key. The key
    length can be specified in bytes, with legal values of 16, 24
    and 32, or in bits, with legal values of 128, 192 and 256. These
@@ -107,6 +114,7 @@ AES_RETURN aes_xi(encrypt_key128)(const unsigned char *key, aes_encrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_ENCRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 
@@ -156,6 +164,7 @@ AES_RETURN aes_xi(encrypt_key192)(const unsigned char *key, aes_encrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_ENCRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 
@@ -208,6 +217,7 @@ AES_RETURN aes_xi(encrypt_key256)(const unsigned char *key, aes_encrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_ENCRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 
@@ -335,6 +345,7 @@ AES_RETURN aes_xi(decrypt_key128)(const unsigned char *key, aes_decrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_DECRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 
@@ -420,6 +431,7 @@ AES_RETURN aes_xi(decrypt_key192)(const unsigned char *key, aes_decrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_DECRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 
@@ -516,6 +528,7 @@ AES_RETURN aes_xi(decrypt_key256)(const unsigned char *key, aes_decrypt_ctx cx[1
     if(VIA_ACE_AVAILABLE)
         cx->inf.b[1] = 0xff;
 #endif
+    MARK_AS_DECRYPTION_CTX(cx);
     return EXIT_SUCCESS;
 }
 

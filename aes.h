@@ -79,6 +79,13 @@ typedef union
     uint8_t b[4];
 } aes_inf;
 
+/* Macros for detecting whether a given context was initialized for  */
+/* use with encryption or decryption code. These should only be used */
+/* by e.g. language bindings which lose type information when the    */
+/* context pointer is passed to the calling language's runtime.      */
+#define IS_ENCRYPTION_CTX(cx) (((cx)->inf.b[2] & (uint8_t)0x01) == 1)
+#define IS_DECRYPTION_CTX(cx) (((cx)->inf.b[2] & (uint8_t)0x01) == 0)
+
 #ifdef _MSC_VER
 #  pragma warning( disable : 4324 )
 #endif

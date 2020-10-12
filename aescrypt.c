@@ -136,7 +136,7 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
 
 #if (ENC_UNROLL == PARTIAL)
     {   uint32_t    rnd;
-        for(rnd = 0; rnd < (cx->inf.b[0] >> 5) - 1; ++rnd)
+        for(rnd = 0; rnd < (cx->inf.b[0] >> 5) - 1ul; ++rnd)
         {
             kp += N_COLS;
             round(fwd_rnd, b1, b0, kp);
@@ -147,7 +147,7 @@ AES_RETURN aes_xi(encrypt)(const unsigned char *in, unsigned char *out, const ae
         round(fwd_rnd,  b1, b0, kp);
 #else
     {   uint32_t    rnd;
-        for(rnd = 0; rnd < (cx->inf.b[0] >> 4) - 1; ++rnd)
+        for(rnd = 0; rnd < (cx->inf.b[0] >> 4) - 1ul; ++rnd)
         {
             kp += N_COLS;
             round(fwd_rnd, b1, b0, kp);
@@ -267,7 +267,7 @@ AES_RETURN aes_xi(decrypt)(const unsigned char *in, unsigned char *out, const ae
 
 #if (DEC_UNROLL == PARTIAL)
     {   uint32_t    rnd;
-        for(rnd = 0; rnd < (cx->inf.b[0] >> 5) - 1; ++rnd)
+        for(rnd = 0; rnd < (cx->inf.b[0] >> 5) - 1ul; ++rnd)
         {
             kp = rnd_key(1);
             round(inv_rnd, b1, b0, kp);
@@ -278,7 +278,7 @@ AES_RETURN aes_xi(decrypt)(const unsigned char *in, unsigned char *out, const ae
         round(inv_rnd, b1, b0, kp);
 #else
     {   uint32_t    rnd;
-        for(rnd = 0; rnd < (cx->inf.b[0] >> 4) - 1; ++rnd)
+        for(rnd = 0; rnd < (cx->inf.b[0] >> 4) - 1ul; ++rnd)
         {
             kp = rnd_key(1);
             round(inv_rnd, b1, b0, kp);

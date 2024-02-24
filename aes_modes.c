@@ -130,7 +130,7 @@ AES_RETURN aes_test_alignment_detection(unsigned int n)	/* 4 <= n <= 16 */
 
 AES_RETURN aes_mode_reset(aes_encrypt_ctx ctx[1])
 {
-    ctx->inf.b[2] = 0;
+    ctx->inf.b[3] = 0;
     return EXIT_SUCCESS;
 }
 
@@ -456,7 +456,7 @@ AES_RETURN aes_cbc_decrypt(const unsigned char *ibuf, unsigned char *obuf,
 
 AES_RETURN aes_cfb_encrypt(const unsigned char *ibuf, unsigned char *obuf,
                     int len, unsigned char *iv, aes_encrypt_ctx ctx[1])
-{   int cnt = 0, b_pos = (int)ctx->inf.b[2], nb;
+{   int cnt = 0, b_pos = (int)ctx->inf.b[3], nb;
 
     if(b_pos)           /* complete any partial block   */
     {
@@ -575,13 +575,13 @@ AES_RETURN aes_cfb_encrypt(const unsigned char *ibuf, unsigned char *obuf,
         b_pos = (b_pos == AES_BLOCK_SIZE ? 0 : b_pos);
     }
 
-    ctx->inf.b[2] = (uint8_t)b_pos;
+    ctx->inf.b[3] = (uint8_t)b_pos;
     return EXIT_SUCCESS;
 }
 
 AES_RETURN aes_cfb_decrypt(const unsigned char *ibuf, unsigned char *obuf,
                     int len, unsigned char *iv, aes_encrypt_ctx ctx[1])
-{   int cnt = 0, b_pos = (int)ctx->inf.b[2], nb;
+{   int cnt = 0, b_pos = (int)ctx->inf.b[3], nb;
 
     if(b_pos)           /* complete any partial block   */
     {   uint8_t t;
@@ -716,13 +716,13 @@ AES_RETURN aes_cfb_decrypt(const unsigned char *ibuf, unsigned char *obuf,
         b_pos = (b_pos == AES_BLOCK_SIZE ? 0 : b_pos);
     }
 
-    ctx->inf.b[2] = (uint8_t)b_pos;
+    ctx->inf.b[3] = (uint8_t)b_pos;
     return EXIT_SUCCESS;
 }
 
 AES_RETURN aes_ofb_crypt(const unsigned char *ibuf, unsigned char *obuf,
                     int len, unsigned char *iv, aes_encrypt_ctx ctx[1])
-{   int cnt = 0, b_pos = (int)ctx->inf.b[2], nb;
+{   int cnt = 0, b_pos = (int)ctx->inf.b[3], nb;
 
     if(b_pos)           /* complete any partial block   */
     {
@@ -841,7 +841,7 @@ AES_RETURN aes_ofb_crypt(const unsigned char *ibuf, unsigned char *obuf,
         b_pos = (b_pos == AES_BLOCK_SIZE ? 0 : b_pos);
     }
 
-    ctx->inf.b[2] = (uint8_t)b_pos;
+    ctx->inf.b[3] = (uint8_t)b_pos;
     return EXIT_SUCCESS;
 }
 
@@ -850,7 +850,7 @@ AES_RETURN aes_ofb_crypt(const unsigned char *ibuf, unsigned char *obuf,
 AES_RETURN aes_ctr_crypt(const unsigned char *ibuf, unsigned char *obuf,
             int len, unsigned char *cbuf, cbuf_inc ctr_inc, aes_encrypt_ctx ctx[1])
 {   unsigned char   *ip;
-    int             i, blen, b_pos = (int)(ctx->inf.b[2]);
+    int             i, blen, b_pos = (int)(ctx->inf.b[3]);
 
 #if defined( USE_VIA_ACE_IF_PRESENT )
     aligned_auto(uint8_t, buf, BFR_LENGTH, 16);
@@ -937,7 +937,7 @@ AES_RETURN aes_ctr_crypt(const unsigned char *ibuf, unsigned char *obuf,
             *obuf++ = *ibuf++ ^ ip[b_pos++];
     }
 
-    ctx->inf.b[2] = (uint8_t)b_pos;
+    ctx->inf.b[3] = (uint8_t)b_pos;
     return EXIT_SUCCESS;
 }
 

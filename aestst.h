@@ -54,7 +54,7 @@ Issue Date: 20/12/2007
 
 #include <windows.h>
 
-#define f_info(x)   (x)->inf.b[2]
+#define f_info(x)   (x)->inf.b[3]
 #define f_ectx      aes_encrypt_ctx
 #define f_dctx      aes_decrypt_ctx
 
@@ -188,7 +188,7 @@ typedef struct  // initialised with subroutine addresses when the DLL is loaded
 
 #elif defined( __cplusplus )
 
-#define f_info(x)               (x)->cx->inf.b[2]
+#define f_info(x)               (x)->cx->inf.b[3]
 #define f_ectx                  AESencrypt
 #define f_enc_key128(a,b)       (a)->key128((b))
 #define f_enc_key192(a,b)       (a)->key192((b))
@@ -216,7 +216,7 @@ typedef struct  // initialised with subroutine addresses when the DLL is loaded
 
 #else
 
-#define f_info(x)               (x)->inf.b[2]
+#define f_info(x)               (x)->inf.b[3]
 #define f_ectx                  aes_encrypt_ctx
 #define f_enc_key128(a,b)       aes_encrypt_key128((b),(a))
 #define f_enc_key192(a,b)       aes_encrypt_key192((b),(a))

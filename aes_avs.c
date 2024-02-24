@@ -56,7 +56,7 @@ char *test_path = "..\\testvals\\avs\\";
 enum line_type find_line2(char str[])
 {   int i;
 
-    for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i) 
+    for(i = 0 ; i < sizeof(hdr_str) / sizeof(hdr_str[0]) ; ++i)
         if(find_string(str, hdr_str[i]) >= 0)
         {
             return (line_type)i;
@@ -259,7 +259,7 @@ void run_aes_avs_test(mode mm, type tt)
                     }
                     break;
                 }
-                if(err > 5)                  
+                if(err > 5)
                 {
                     printf("\nAborted - too many error on file %s", path);
                     break;

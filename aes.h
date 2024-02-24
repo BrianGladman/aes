@@ -71,8 +71,12 @@ extern "C"
 
 /* the character array 'inf' in the following structures is used     */
 /* to hold AES context information. This AES code uses cx->inf.b[0]  */
-/* to hold the number of rounds multiplied by 16. The other three    */
-/* elements can be used by code that implements additional modes     */
+/* to hold the number of rounds multiplied by 16. The VIA_ACE code   */
+/* uses cx->inf.b[1] to manage the interface to the hardware. The    */
+/* main AES code uses cx->b[2] to signal that an encryption context  */
+/* has been set for encryption or decryption. The modes code uses    */
+/* ctx->inf.b[3] to hold the position within an AES block for modes  */
+/* that require this.                                                */
 
 typedef union
 {   uint32_t l;

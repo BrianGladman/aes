@@ -26,7 +26,9 @@ Issue Date: 03/08/2018
 #if defined(_MSC_VER)
 
 #include <intrin.h>
+#ifndef _ARM64EC_
 #pragma intrinsic(__cpuid)
+#endif // !_ARM64EC_
 #define INLINE  __inline
 
 INLINE int has_aes_ni(void)

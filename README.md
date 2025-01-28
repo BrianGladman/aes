@@ -210,7 +210,7 @@ environments
         x86 assembler:  aes_x86_v1.asm
         defines         ASM_X86_V1C (set for C and assembler files)
     
-	dll_asm_x86_v1c     Win32
+	dll_asm_x86_v1c Win32
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
         C source:       aeskey.c, aestab.c, aes_modes.c
         x86 assembler:  aes_x86_v1.asm
@@ -226,15 +226,15 @@ environments
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
         C source:       aeskey.c, aestab.c, aes_modes.c
         x86 assembler:  aes_x86_v1.asm
-        defines         DLL_EXPORT, ASM_X86_V2C (set for C and assembler files)
+        defines          DLL_EXPORT, ASM_X86_V2C (set for C and assembler files)
 
     lib_asm_x86_v2      Win32
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
-        C source:       aes_modes.c
+        C source:       aes_modes.c 
         x86 assembler:  aes_x86_v1.asm
         defines         ASM_X86_V2 (set for C and assembler files)
     
-	dll_asm_x86_v2      Win32
+	dll_asm_x86_v2  Win32
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
         C source:       aes_modes.c
         x86 assembler:  aes_x86_v1.asm
@@ -243,14 +243,14 @@ environments
     lib_asm_amd64_c     x64
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
 		                (+ aes_ni.h for AES_NI)
-        C source:       aes_modes.c (+ aes_ni.c for AES_NI)
+        C source:       aeskey.c, aestab.c, aes_modes.c (+ aes_ni.c for AES_NI)
         x86 assembler:  aes_amd64.asm
         defines         ASM_AMD64_C (set for C and assembler files)
     
 	dll_asm_amd64_c     x64
         headers:        aes.h, aesopt.h, aestab.h, brg_endian.h, tdefs.h
 		                (+ aes_ni.h for AES_NI)
-        C source:       aes_modes.c (+ aes_ni.c for AES_NI)
+        C source:       aeskey.c, aestab.c, aes_modes.c (+ aes_ni.c for AES_NI)
         x86 assembler:  aes_amd64.asm
         defines         DLL_EXPORT, ASM_AMD64_C (set for C and assembler files)
 

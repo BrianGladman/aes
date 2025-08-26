@@ -2,6 +2,12 @@
 An AES (Rijndael) Implementation in C/C++ (as specified in FIPS-197)
 ====================================================================
 
+Change (26/08/2025)
+===================
+
+1. Move Output directory for the Python Binding from lib to lib_python
+   becasue its ouputs were inconsistent with normal aes library builds
+
 Change (26/09/2018)
 ===================
 

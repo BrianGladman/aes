@@ -161,6 +161,7 @@
     <Lib />
     <PostBuildEvent>
       <Command>copy "$(TargetDir)$(TargetName).lib" "$(SolutionDir)lib\$(Platform)\$(Configuration)\aes.lib"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)lib\$(Platform)\$(Configuration)\aes.pdb"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
